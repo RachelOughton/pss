@@ -1,2 +1,2 @@
 # pss
-R package for Propensity Score Sampling
+R package for Propensity Score Sampling. Github readme.
