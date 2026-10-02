@@ -4,13 +4,14 @@
 #' @name matched_sample
 #' @param df A data frame containing treatment group and comparison cohort data
 #' @param propscore_df A data frame with a column for each variable in `cov_cols` and a `PropScore` column giving the estimated propensity score for each combination of their levels. This should have been returned by `propscore_df`.
-#' @param cov_cols A vector of strings, the column names of the covariates to be matched on. These should all be factor / categorical data.
-#' @param arm_col The name of the column indicating which rows are treated cases and which are comparison cases. These should be factor or character, with only two levels / options.
-#' @param intervention_level The value in the `arm_col` for the treatment cases
 #' @param seed The random seed to be used, for reproducibility
+#' @param use_attr logical. Should the attributes of `propscore_df` (set by [propscore_df()]) be used to specify `cov_cols`, `arm_col` and `intervention_level`?
 #' @param replace logical. Should the comparison cases be sampled with replacement?
 #' @param downsample logical. Should the treatment cases be downsampled when there aren't enough comparison cases? Only one of `replace` and `downsample` should be TRUE.
 #' @param drop_int logical. Should cases in the intervention/treated group be dropped if there are no equivalent cases in the comparison cohort to sample from?
+#' @param cov_cols (only specify if `use_attr == FALSE`) A character vector containing the column names of the covariates to be matched on. These should all be factor / categorical data.
+#' @param arm_col (only specify if `use_attr == FALSE`) The name of the column indicating which rows are treated cases and which are comparison cases. These should be factor or character, with only two levels / options.
+#' @param intervention_level (only specify if `use_attr == FALSE`) The value in the `arm_col` for the treatment cases
 
 #'
 #' @return [matched_sample()] returns a data frame that is an expanded form of `df`, with the same number of rows, in the same order, but some extra columns:
@@ -43,15 +44,13 @@
 #'    )
 #'
 #' ## Now we can use `eg_j_exp300` to find a matched comparison group
-#' ## In this version we sample from the comparison group with replacement
+#' ## In this example we use the attribute information in `propscore_df`,
+#' ## we sample from the comparison group with replacement
 #' ## and do not drop any intervention cases for which there are no
 #' ## comparison cases to sample
 #' match_j_exp300_replace = matched_sample(
 #'    df = eg_data,
 #'    propscore_df = eg_j_exp300,
-#'    cov_cols = c("category", "risk_ass", "sus_age_bin"),
-#'    arm_col = "Arm",
-#'    intervention_level = "Intervention",
 #'    seed = 20,
 #'    replace = TRUE,
 #'    downsample = FALSE,
@@ -64,19 +63,37 @@
 matched_sample = function(
     df,
     propscore_df,
-    cov_cols,
-    arm_col,
-    intervention_level,
     seed,
-    replace = T,
-    downsample = F,
-    drop_int = F
+    use_attr = TRUE,
+    replace = TRUE,
+    downsample = FALSE,
+    drop_int = FALSE,
+    cov_cols = NULL,
+    arm_col = NULL,
+    intervention_level = NULL
+
 ){
   set.seed(seed)
   Arm <- include <- NULL
   ## Check this is doing what I want!
   if((replace & downsample)|!(replace | downsample)){
     stop("Exactly one of replace and downsample should be TRUE")
+  }
+
+  ## Check use_attr is being used OK
+
+  if(use_attr){
+    if(any((!is.null(cov_cols))|(!is.null(arm_col))|(!is.null(intervention_level)))){
+      stop("You have set use_attr = TRUE, so all of cov_cols, arm_col and intervention_level should be NULL")
+    }
+    cov_cols = attr(propscore_df, "cov_cols")
+    arm_col = attr(propscore_df, "arm_col")
+    intervention_level = attr(propscore_df, "intervention_level")
+  } else if (!use_attr) {
+    if(any((is.null(cov_cols))|(is.null(arm_col))|(is.null(intervention_level)))){
+      stop("You have set use_attr to FALSE so cov_cols, arm_col and intervention_level must all be specified")
+    }
+
   }
 
   df = pss_check_data(
@@ -191,6 +208,15 @@ matched_sample = function(
   }
 
   df$seed = seed
+  attributes(df) = c(
+    attributes(df),
+    list(
+      cov_cols = cov_cols,
+      arm_col = arm_col,
+      intervention_level = intervention_level
+    )
+  )
+
   df
 
 }

@@ -21,7 +21,7 @@ pz1_expectedN(n_pz1)
 \arguments{
 \item{df}{A data frame containing treatment group and comparison cohort data}
 
-\item{cov_cols}{A vector of strings, the column names of the covariates to be matched on. These should all be factor / categorical data.}
+\item{cov_cols}{A character vector containing the column names of the covariates to be matched on. These should all be factor / categorical data.}
 
 \item{arm_col}{The name of the column indicating which rows are treated cases and which are comparison cases. These should be factor or character, with only two levels / options.}
 
@@ -36,7 +36,7 @@ pz1_expectedN(n_pz1)
 \item{n_pz1}{An argument to \code{pz1_fn}. Its meaning depends on the function used for \code{pz1_fn}.}
 }
 \value{
-\code{propscore_df} returns a data frame (more detail here, including the columns!).
+\code{propscore_df} returns a data frame (more detail here, including the columns! and attributes).
 
 \code{props_fun} returns a function that creates a data frame containing \code{px_int} (p(x|Z=1)), \code{px_comp} (p(x) and \code{ratio} (\code{px_int / px_comp}) for every combination of the levels of the covariates in \code{cov_cols}, using the approach specified via \code{cov_dist}.
 

@@ -15,5 +15,6 @@ Config/roxygen2/version: 8.1.0
 Imports: 
     dplyr,
     rlang,
+    smd,
     tidyr,
     tidyselect

@@ -9,7 +9,7 @@
 #'
 #' @name pss_check_data
 #' @param df A data frame containing treatment group and comparison cohort data
-#' @param cov_cols A vector of strings, the column names of the covariates to be matched on. These should all be factor / categorical data.
+#' @param cov_cols A character vector containing the column names of the covariates to be matched on. These should all be factor / categorical data.
 #' @param arm_col The name of the column indicating which rows are treated cases and which are comparison cases. These should be factor or character, with only two levels / options.
 #' @param intervention_level The value in the `arm_col` for the treatment cases
 #' @return `pss_check_data` returns a (possibly slightly tidied up) data frame or an error message. The data frame will have an `Arm` column with levels `Intervention` and `Comparison`.

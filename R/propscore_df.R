@@ -3,7 +3,7 @@
 #' Generate data frame of propensity score estimates to be used in sampling
 #' @name propscore_df
 #' @param df A data frame containing treatment group and comparison cohort data
-#' @param cov_cols A vector of strings, the column names of the covariates to be matched on. These should all be factor / categorical data.
+#' @param cov_cols A character vector containing the column names of the covariates to be matched on. These should all be factor / categorical data.
 #' @param arm_col The name of the column indicating which rows are treated cases and which are comparison cases. These should be factor or character, with only two levels / options.
 #' @param intervention_level The value in the `arm_col` for the treatment cases
 #' @param cov_dist Either "joint" for fully joint distribution, "marginal" for fully marginal distribution, or a list of of character vectors indicating groups of covariates that should be considered jointly.
@@ -11,7 +11,7 @@
 #' @param n_pz1 An argument to `pz1_fn`. Its meaning depends on the function used for `pz1_fn`.
 #' @param cov_list An argument to `props_fun`. This should be a list of character vectors. The elements of the list determine which groups of covariates are treated jointly. If `cov_dist` is "marginal" or "joint" then this is created automatically from `cov_cols`. If `cov_dist` is a list of groups of covariates to be treated jointly then the covariates to be treated marginally are filled in automatically.
 #'
-#' @return `propscore_df` returns a data frame (more detail here, including the columns!).
+#' @return `propscore_df` returns a data frame (more detail here, including the columns! and attributes).
 #' @export
 #'
 #' @examples
@@ -90,7 +90,14 @@ propscore_df = function(
   pz1_fun = pz1_fn
   pz1 = pz1_fun(df_out)
   df_out$PropScore = pz1*df_out$ratio
-
+  attributes(df_out) = c(
+    attributes(df_out),
+    list(
+      cov_cols = cov_cols,
+      arm_col = arm_col,
+      intervention_level = intervention_level
+    )
+  )
   df_out
 
 }

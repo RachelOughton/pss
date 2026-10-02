@@ -3,6 +3,7 @@ load("data/eg_data.rda")
 
 ## After merging functions into props_fun
 
+
 eg_j_est1 = propscore_df(
   df = eg_data,
   cov_cols = c("risk_ass", "category", "sus_age_bin"),

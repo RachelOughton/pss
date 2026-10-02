@@ -9,7 +9,7 @@ pss_check_data(df, cov_cols, arm_col, intervention_level)
 \arguments{
 \item{df}{A data frame containing treatment group and comparison cohort data}
 
-\item{cov_cols}{A vector of strings, the column names of the covariates to be matched on. These should all be factor / categorical data.}
+\item{cov_cols}{A character vector containing the column names of the covariates to be matched on. These should all be factor / categorical data.}
 
 \item{arm_col}{The name of the column indicating which rows are treated cases and which are comparison cases. These should be factor or character, with only two levels / options.}
 
