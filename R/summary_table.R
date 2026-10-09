@@ -62,6 +62,8 @@
 
 
 ## For C-stat, do a min and max case (not sure completely how right now)
+## Do I want some kind of progress bar? I don't think I want to rely on another package
+## but I could use the length of seeds (ie. if it's over 50 then print what percentage done for 10% bands?)
 summary_table = function(
     df,
     propscore_df,
@@ -97,11 +99,16 @@ summary_table = function(
       paste(smd_cols[!(smd_col_classes %in% c("factor", "character"))], collapse = ", ")
       ))
   smd_int_cols = smd_cols[smd_col_classes %in% c("factor", "character")]
-#  smd_terms = smd_linear_names # names for SMD columns
-#  smd_var_cols = smd_cols # vector for keeping track of columns to be used in SMD
-  for (j in 1:length(seeds)){
-    smd_int_prev = smd_int_cols # These need to start the same, then at order == 2 smd_int_prev will be updated
 
+  if(length(seeds) > 10){
+    prog_ints = round((1:10)*(length(seeds)/10))
+    prog_perc = (1:10)*10
+  }
+
+  for (j in 1:length(seeds)){
+    if(j %in% prog_ints){
+      message(sprintf("%g percent complete", prog_perc[prog_ints == j]))
+    }
     df_j = matched_sample(
       df = df,
       propscore_df = propscore_df,
@@ -132,10 +139,11 @@ summary_table = function(
     ## Need to think carefully about higher order interactions - smd_int and smd_cols
     while (order <= smd_order){
 
-      smd_col_inner = paste(rep("smd_int_cols", order), collapse = ", ")
-      smd_int_text = sprintf("eg_smd = expand.grid(%s)", smd_col_inner)
-      eval(parse(text = smd_int_text))
-
+      eg_list = list()
+      for (l in 1:order){
+        eg_list[[l]] = smd_int_cols
+      }
+      eg_smd = do.call(expand.grid, eg_list)
       eg_smd = apply(eg_smd, c(1,2), as.character)
 
       eg_smd_sorted = as.data.frame(t(apply(eg_smd, 1, sort))) ## To keep it in the same aspect ratio
