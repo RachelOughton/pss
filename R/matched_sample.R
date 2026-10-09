@@ -12,7 +12,6 @@
 #' @param cov_cols (only specify if `use_attr == FALSE`) A character vector containing the column names of the covariates to be matched on. These should all be factor / categorical data.
 #' @param arm_col (only specify if `use_attr == FALSE`) The name of the column indicating which rows are treated cases and which are comparison cases. These should be factor or character, with only two levels / options.
 #' @param intervention_level (only specify if `use_attr == FALSE`) The value in the `arm_col` for the treatment cases
-
 #'
 #' @return [matched_sample()] returns a data frame that is an expanded form of `df`, with the same number of rows, in the same order, but some extra columns:
 #' - `PropScore`: the propensity score for that row, from `propscore_df`
@@ -74,6 +73,7 @@ matched_sample = function(
 
 ){
   set.seed(seed)
+
   Arm <- include <- NULL
   ## Check this is doing what I want!
   if((replace & downsample)|!(replace | downsample)){
@@ -93,7 +93,6 @@ matched_sample = function(
     if(any((is.null(cov_cols))|(is.null(arm_col))|(is.null(intervention_level)))){
       stop("You have set use_attr to FALSE so cov_cols, arm_col and intervention_level must all be specified")
     }
-
   }
 
   df = pss_check_data(

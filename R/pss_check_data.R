@@ -82,20 +82,23 @@ pss_check_data = function(
       )
     }
     ## Check that it is factor (or could be treated as such)
-    if(!is.factor(col_i_vec)){
-      if(is.character(col_i_vec)){
-        col_i_fac = as.factor(col_i_vec)
-        warning(
-          sprintf("Column %s has been coerced to a factor with %g levels",
-                  col_i, nlevels(col_i_fac))
-        )
-      } else {
-        stop(
-          sprintf("Covariates should be factors, but %s is %s",
-                  col_i, class(col_i_vec))
-        )
+#    if(require_factor){
+      if(!is.factor(col_i_vec)){
+        if(is.character(col_i_vec)){
+          col_i_fac = as.factor(col_i_vec)
+          warning(
+            sprintf("Column %s has been coerced to a factor with %g levels",
+                    col_i, nlevels(col_i_fac))
+          )
+        } else {
+          stop(
+            sprintf("Covariates should be factors, but %s is %s",
+                    col_i, class(col_i_vec))
+          )
+        }
       }
-    }
+#    }
+
   }
 
   ## Need to actually lose the NAs (but only from cov_cols or arm_col)

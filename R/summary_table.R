@@ -60,6 +60,8 @@
 #'
 #' @importFrom rlang .data
 
+
+## For C-stat, do a min and max case (not sure completely how right now)
 summary_table = function(
     df,
     propscore_df,
@@ -75,16 +77,94 @@ summary_table = function(
     intervention_level = NULL
     ){
   n_seeds = length(seeds)
-  ## Do I need to have lots of checks or will these be done by `matched_sample` in the loop?
-  ## Lots more checking needed!
 
+## Check some things specific to summary_table (lots will be checked by matched_sample)
   df_out = data.frame(
     seed = seeds,
     n_int = rep(NA, n_seeds),
     n_comp = rep(NA, n_seeds)
   )
   smd_linear_names = sprintf("SMD_%s", smd_cols)
-  ## Use expand.grid to find all the combinations for smd_order
-  ## expand.grid(letters[1:3], letters[4:5], letters[6:7])
+  for (name in smd_linear_names)
+    df_out[[name]] = NA
+  if(smd_order > length(smd_cols))
+    stop("You can't have smd_order greater than the length of smd_cols.")
 
+  smd_col_classes = df |> dplyr::select(smd_cols) |> lapply(class) |> unlist()
+  if((any(!(smd_col_classes %in% c("factor", "character"))))&(smd_order > 1))
+    warning(sprintf(
+      "The interaction SMD will not include %s as it does not have class factor or character",
+      paste(smd_cols[!(smd_col_classes %in% c("factor", "character"))], collapse = ", ")
+      ))
+  smd_int_cols = smd_cols[smd_col_classes %in% c("factor", "character")]
+#  smd_terms = smd_linear_names # names for SMD columns
+#  smd_var_cols = smd_cols # vector for keeping track of columns to be used in SMD
+  for (j in 1:length(seeds)){
+    smd_int_prev = smd_int_cols # These need to start the same, then at order == 2 smd_int_prev will be updated
+
+    df_j = matched_sample(
+      df = df,
+      propscore_df = propscore_df,
+      cov_cols = cov_cols,
+      use_attr = use_attr,
+      arm_col = arm_col,
+      intervention_level = intervention_level,
+      seed = seeds[j],
+      replace = replace,
+      downsample = downsample,
+      drop_int = drop_int
+    ) |> suppressMessages()
+    df_j = df_j |> expand_matched_df()
+
+    ## Need to do the match and make an expanded df!!
+    df_out$n_int[j] = sum(df_j$Arm == "Intervention")
+    df_out$n_comp[j] = sum(df_j$Arm == "Comparison")
+    for (i in 1:length(smd_cols)){
+      df_out[[smd_linear_names[i]]][j] = smd::smd(
+        x = df_j[[smd_cols[[i]]]],
+        g = df_j$Arm
+      )$estimate
+    }
+
+    order = 2
+    ## Do we want square and cubes of things? Let's say not
+    ## Have I renamed something inside the loop that then breaks something?
+    ## Need to think carefully about higher order interactions - smd_int and smd_cols
+    while (order <= smd_order){
+
+      smd_col_inner = paste(rep("smd_int_cols", order), collapse = ", ")
+      smd_int_text = sprintf("eg_smd = expand.grid(%s)", smd_col_inner)
+      eval(parse(text = smd_int_text))
+
+      eg_smd = apply(eg_smd, c(1,2), as.character)
+
+      eg_smd_sorted = as.data.frame(t(apply(eg_smd, 1, sort))) ## To keep it in the same aspect ratio
+      eg_smd_sorted = unique(eg_smd_sorted)
+      n_unique = sapply(1:nrow(eg_smd_sorted), function(i){length(unique(as.character(eg_smd_sorted[i,])))})
+      eg_smd_sorted = eg_smd_sorted[n_unique == ncol(eg_smd_sorted), ]
+      smd_int_prev = eg_smd_sorted # to pass onto next order, if there is one
+
+      for (k in 1:nrow(eg_smd_sorted)){ # go through each interaction
+        SMD_name_k = sprintf("SMD_%s", paste(eg_smd_sorted[k,], collapse=".")) # name of new column
+        df_int_k = df_j |> select(as.character(eg_smd_sorted[k,])) # data for new column
+
+        df_int_k[[SMD_name_k]] = sapply( # create single column for interaction (to be x in smd())
+          1:nrow(df_j),
+          function(i){
+            # as.character turns these to numbers, but actually since it's temporary and it only matters
+            # what the distributions are, I don't think that matters
+            paste(as.character(df_int_k[i, ]), collapse = ".")
+          }
+        )
+        df_int_k$Arm = df_j$Arm # add arm (to be g in smd())
+        df_out[[SMD_name_k]][j] = smd::smd( # in the first run this adds the value to all - does it work from j=2 onwards?
+          x = df_int_k[[SMD_name_k]],
+          g = df_int_k$Arm
+        )$estimate
+      }
+      order = order + 1
+    }
+
+  }
+  return(df_out)
 }
