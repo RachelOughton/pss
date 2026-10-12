@@ -60,28 +60,28 @@ Generate a matched sample using the propensity score sampling approach
 ## This example uses the joint approach and specifies p(Z=1) such
 ## that the expected size of the comparison group is 300
 
-eg_j_exp300 = propscore_df(
-   df = eg_data,
-   cov_cols = c("risk_ass", "category", "sus_age_bin"),
-   arm_col = "Arm",
-   intervention_level = "Intervention",
-   cov_dist = "joint",
-   pz1_fn = pz1_expectedN(300)
-   )
+eg_j_exp300 <- propscore_df(
+  df = eg_data,
+  cov_cols = c("risk_ass", "category", "sus_age_bin"),
+  arm_col = "Arm",
+  intervention_level = "Intervention",
+  cov_dist = "joint",
+  pz1_fn = pz1_expectedN(300)
+)
 
 ## Now we can use `eg_j_exp300` to find a matched comparison group
 ## In this example we use the attribute information in `propscore_df`,
 ## we sample from the comparison group with replacement
 ## and do not drop any intervention cases for which there are no
 ## comparison cases to sample
-match_j_exp300_replace = matched_sample(
-   df = eg_data,
-   propscore_df = eg_j_exp300,
-   seed = 20,
-   replace = TRUE,
-   downsample = FALSE,
-   drop_int = FALSE
-   )
+match_j_exp300_replace <- matched_sample(
+  df = eg_data,
+  propscore_df = eg_j_exp300,
+  seed = 20,
+  replace = TRUE,
+  downsample = FALSE,
+  drop_int = FALSE
+)
 
 }
 \seealso{

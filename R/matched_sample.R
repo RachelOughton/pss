@@ -33,153 +33,155 @@
 #' ## This example uses the joint approach and specifies p(Z=1) such
 #' ## that the expected size of the comparison group is 300
 #'
-#' eg_j_exp300 = propscore_df(
-#'    df = eg_data,
-#'    cov_cols = c("risk_ass", "category", "sus_age_bin"),
-#'    arm_col = "Arm",
-#'    intervention_level = "Intervention",
-#'    cov_dist = "joint",
-#'    pz1_fn = pz1_expectedN(300)
-#'    )
+#' eg_j_exp300 <- propscore_df(
+#'   df = eg_data,
+#'   cov_cols = c("risk_ass", "category", "sus_age_bin"),
+#'   arm_col = "Arm",
+#'   intervention_level = "Intervention",
+#'   cov_dist = "joint",
+#'   pz1_fn = pz1_expectedN(300)
+#' )
 #'
 #' ## Now we can use `eg_j_exp300` to find a matched comparison group
 #' ## In this example we use the attribute information in `propscore_df`,
 #' ## we sample from the comparison group with replacement
 #' ## and do not drop any intervention cases for which there are no
 #' ## comparison cases to sample
-#' match_j_exp300_replace = matched_sample(
-#'    df = eg_data,
-#'    propscore_df = eg_j_exp300,
-#'    seed = 20,
-#'    replace = TRUE,
-#'    downsample = FALSE,
-#'    drop_int = FALSE
-#'    )
+#' match_j_exp300_replace <- matched_sample(
+#'   df = eg_data,
+#'   propscore_df = eg_j_exp300,
+#'   seed = 20,
+#'   replace = TRUE,
+#'   downsample = FALSE,
+#'   drop_int = FALSE
+#' )
 #'
 #' @importFrom rlang .data
 #'
 
-matched_sample = function(
-    df,
-    propscore_df,
-    seed,
-    use_attr = TRUE,
-    replace = TRUE,
-    downsample = FALSE,
-    drop_int = FALSE,
-    cov_cols = NULL,
-    arm_col = NULL,
-    intervention_level = NULL
-
-){
+matched_sample <- function(
+  df,
+  propscore_df,
+  seed,
+  use_attr = TRUE,
+  replace = TRUE,
+  downsample = FALSE,
+  drop_int = FALSE,
+  cov_cols = NULL,
+  arm_col = NULL,
+  intervention_level = NULL
+) {
   set.seed(seed)
 
   Arm <- include <- NULL
   ## Check this is doing what I want!
-  if((replace & downsample)|!(replace | downsample)){
+  if ((replace & downsample) | !(replace | downsample)) {
     stop("Exactly one of replace and downsample should be TRUE")
   }
 
   ## Check use_attr is being used OK
 
-  if(use_attr){
-    if(any((!is.null(cov_cols))|(!is.null(arm_col))|(!is.null(intervention_level)))){
+  if (use_attr) {
+    if (any((!is.null(cov_cols)) | (!is.null(arm_col)) | (!is.null(intervention_level)))) {
       stop("You have set use_attr = TRUE, so all of cov_cols, arm_col and intervention_level should be NULL")
     }
-    cov_cols = attr(propscore_df, "cov_cols")
-    arm_col = attr(propscore_df, "arm_col")
-    intervention_level = attr(propscore_df, "intervention_level")
+    cov_cols <- attr(propscore_df, "cov_cols")
+    arm_col <- attr(propscore_df, "arm_col")
+    intervention_level <- attr(propscore_df, "intervention_level")
   } else if (!use_attr) {
-    if(any((is.null(cov_cols))|(is.null(arm_col))|(is.null(intervention_level)))){
+    if (any((is.null(cov_cols)) | (is.null(arm_col)) | (is.null(intervention_level)))) {
       stop("You have set use_attr to FALSE so cov_cols, arm_col and intervention_level must all be specified")
     }
   }
 
-  df = pss_check_data(
+  df <- pss_check_data(
     df = df,
     cov_cols = cov_cols,
     arm_col = arm_col,
     intervention_level = intervention_level
   )
 
-## Check that propscore_df has the right parts
+  ## Check that propscore_df has the right parts
 
-  ps_df_names = c(cov_cols, "PropScore")
-  if(any(!(ps_df_names %in% names(propscore_df)))){
+  ps_df_names <- c(cov_cols, "PropScore")
+  if (any(!(ps_df_names %in% names(propscore_df)))) {
     stop(
-      sprintf("propscore_df should contain the columns %s. It does not contain %s",
-              paste(ps_df_names, collapse = ", "),
-              paste(ps_df_names[!(ps_df_names %in% names(propscore_df))], collapse = ", ")
-              )
+      sprintf(
+        "propscore_df should contain the columns %s. It does not contain %s",
+        paste(ps_df_names, collapse = ", "),
+        paste(ps_df_names[!(ps_df_names %in% names(propscore_df))], collapse = ", ")
+      )
     )
   }
   # Not sure I need these indices
-  match_col_indices = (1:ncol(df))[names(df) %in% cov_cols]
-  cov_cols = names(df)[match_col_indices] # reorders so that names match indices
-  n_covs = length(cov_cols)
-  arm_col_index = (1:ncol(df))[names(df) == arm_col]
+  match_col_indices <- (1:ncol(df))[names(df) %in% cov_cols]
+  cov_cols <- names(df)[match_col_indices] # reorders so that names match indices
+  n_covs <- length(cov_cols)
+  arm_col_index <- (1:ncol(df))[names(df) == arm_col]
   ## New column for sampling results
   ## Label by 0, 1 etc. so I can include multiples this way
-  df$include = 0
+  df$include <- 0
 
-  df = dplyr::left_join(df, propscore_df, by = cov_cols)
-  if(replace){
-    for (i in 1:nrow(df)){
-      arm_i = df[[arm_col]][i]
-      prob_samp_i = as.numeric(df$PropScore[i])
+  df <- dplyr::left_join(df, propscore_df, by = cov_cols)
+  if (replace) {
+    for (i in 1:nrow(df)) {
+      arm_i <- df[[arm_col]][i]
+      prob_samp_i <- as.numeric(df$PropScore[i])
 
-      if(arm_i == "Comparison"){
-        ran_i = runif(1)
-        if(prob_samp_i > 1){
-          df$include[i] = floor(prob_samp_i)
-          prob_remainder_i = prob_samp_i - floor(prob_samp_i)
-          if(ran_i < prob_remainder_i){
-            df$include[i] = df$include[i]+1
+      if (arm_i == "Comparison") {
+        ran_i <- runif(1)
+        if (prob_samp_i > 1) {
+          df$include[i] <- floor(prob_samp_i)
+          prob_remainder_i <- prob_samp_i - floor(prob_samp_i)
+          if (ran_i < prob_remainder_i) {
+            df$include[i] <- df$include[i] + 1
           }
         } else {
-          if(ran_i <= prob_samp_i){
-            df$include[i] = 1
+          if (ran_i <= prob_samp_i) {
+            df$include[i] <- 1
           }
         }
-      } else if (arm_i == "Intervention"){
+      } else if (arm_i == "Intervention") {
         ## Keep all of intervention cases (for now!)
-        df$include[i] = 1
+        df$include[i] <- 1
       }
     }
-  ## Create message to say how many cases are being repeated, and how many times
-    df_repeat_summary = df |>
+    ## Create message to say how many cases are being repeated, and how many times
+    df_repeat_summary <- df |>
       dplyr::filter(Arm == "Comparison") |>
       dplyr::filter(include > 1) |>
       dplyr::group_by(include) |>
       dplyr::summarise(n = dplyr::n())
-    if(any(df$include > 1)){
-      for (i in 1:nrow(df_repeat_summary)){
+    if (any(df$include > 1)) {
+      for (i in 1:nrow(df_repeat_summary)) {
         message(
-          sprintf("%g comparison cases are being repeated %g times",
-                  df_repeat_summary$n[i], df_repeat_summary$include[i])
+          sprintf(
+            "%g comparison cases are being repeated %g times",
+            df_repeat_summary$n[i], df_repeat_summary$include[i]
+          )
         )
       }
     }
-  } else if (downsample){
-    for (i in 1:nrow(df)){
-      arm_i = df[[arm_col]][i]
-      prob_samp_i = as.numeric(df$PropScore[i])
+  } else if (downsample) {
+    for (i in 1:nrow(df)) {
+      arm_i <- df[[arm_col]][i]
+      prob_samp_i <- as.numeric(df$PropScore[i])
 
-      if(arm_i == "Comparison"){
-        ran_i = runif(1)
-        if(ran_i <= prob_samp_i){ ## ran_i<=1, so this includes any with prob_150_i>1 with certainty
-          df$include[i] = 1
+      if (arm_i == "Comparison") {
+        ran_i <- runif(1)
+        if (ran_i <= prob_samp_i) { ## ran_i<=1, so this includes any with prob_150_i>1 with certainty
+          df$include[i] <- 1
         }
-      } else if (arm_i == "Intervention"){
-        ran_i = runif(1)
-        if((prob_samp_i>1)&(ran_i <= 1/prob_samp_i)){ # If we need to downsample the intervention
-          df$include[i] = 1
-        } else if (prob_samp_i <= 1){   # If we are instead downsampling the comparison
-          df$include[i] = 1
+      } else if (arm_i == "Intervention") {
+        ran_i <- runif(1)
+        if ((prob_samp_i > 1) & (ran_i <= 1 / prob_samp_i)) { # If we need to downsample the intervention
+          df$include[i] <- 1
+        } else if (prob_samp_i <= 1) { # If we are instead downsampling the comparison
+          df$include[i] <- 1
         }
       }
     }
-    n_int_lost = df |>
+    n_int_lost <- df |>
       dplyr::filter(Arm == "Intervention") |>
       dplyr::filter(include == 0) |>
       nrow()
@@ -188,26 +190,30 @@ matched_sample = function(
     )
   }
 
-  if(drop_int){
+  if (drop_int) {
     ## Drop the intervention cases where there are no comparison cases to sample from
-    df$include[is.infinite(df$PropScore)] = 0
-    if(sum(is.infinite(df$PropScore)) > 0){
+    df$include[is.infinite(df$PropScore)] <- 0
+    if (sum(is.infinite(df$PropScore)) > 0) {
       message(
-        sprintf("%g intervention cases have been dropped because there are no comparison cases to sample",
-                sum(is.infinite(df$PropScore)))
+        sprintf(
+          "%g intervention cases have been dropped because there are no comparison cases to sample",
+          sum(is.infinite(df$PropScore))
+        )
       )
     }
   } else {
-    if(sum(is.infinite(df$PropScore)) > 0){
+    if (sum(is.infinite(df$PropScore)) > 0) {
       message(
-        sprintf("%g intervention cases have been kept even though there are no comparison cases to sample",
-                sum(is.infinite(df$PropScore)))
+        sprintf(
+          "%g intervention cases have been kept even though there are no comparison cases to sample",
+          sum(is.infinite(df$PropScore))
+        )
       )
     }
   }
 
-  df$seed = seed
-  attributes(df) = c(
+  df$seed <- seed
+  attributes(df) <- c(
     attributes(df),
     list(
       cov_cols = cov_cols,
@@ -217,7 +223,4 @@ matched_sample = function(
   )
 
   df
-
 }
-
-

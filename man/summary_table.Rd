@@ -36,7 +36,7 @@ summary_table(
 
 \item{drop_int}{logical. Passed to \code{\link[=matched_sample]{matched_sample()}}. Should cases in the intervention/treated group be dropped if there are no equivalent cases in the comparison cohort to sample from?}
 
-\item{use_attr}{logical. Should the attributes of \code{propscore_df} (set by \code{\link[=propscore_df]{propscore_df()}}) be used to specify \code{cov_cols}, \code{arm_col} and \code{intervention_level}?}
+\item{use_attr}{logical. Should the attributes of \code{propscore_df} (set by \code{\link[=propscore_df]{propscore_df()}}) be used to specify \code{cov_cols}, \code{arm_col} and \code{intervention_level}? Default \code{TRUE}}
 
 \item{cov_cols}{(only specify if \code{use_attr == FALSE}) A character vector containing the column names of the covariates to be matched on. These should all be factor / categorical data.}
 
@@ -50,7 +50,7 @@ summary_table(
 \item seed
 \item \code{n_int}: the number of treated / intervention cases included in the matched sample for that seed
 \item \code{n_comp}: the number of comparison cases included in the matched sample for that seed
-\item \code{SMD_...}: column for each covariate and covariate interaction, giving the calculated SMD
+\item \code{SMD_...}: column for each covariate and covariate interaction, giving the calculated SMD, found using \code{\link[smd:smd]{smd::smd()}}
 }
 }
 \description{
@@ -61,33 +61,33 @@ Create a summary table for a vector of seeds
 ## This example uses the joint approach and specifies p(Z=1) such
 ## that the expected size of the comparison group is 300
 
-eg_j_exp300 = propscore_df(
-   df = eg_data,
-   cov_cols = c("risk_ass", "category", "sus_age_bin"),
-   arm_col = "Arm",
-   intervention_level = "Intervention",
-   cov_dist = "joint",
-   pz1_fn = pz1_expectedN(300)
-   )
+eg_j_exp300 <- propscore_df(
+  df = eg_data,
+  cov_cols = c("risk_ass", "category", "sus_age_bin"),
+  arm_col = "Arm",
+  intervention_level = "Intervention",
+  cov_dist = "joint",
+  pz1_fn = pz1_expectedN(300)
+)
 
 ## Now we can use `eg_j_exp300` to find a matched comparison group
-## In this version we sample from the comparison group with replacement
-## and do not drop any intervention cases for which there are no
-## comparison cases to sample
+## for each seed in the vector `seeds`. [summary_table()] calls
+## [matched_sample()] each time it does this, and we specify that
+## it should downsample the intervention cases (`downsample = TRUE`)
+## rather than sampling from the comparison cases with replacement.
+## In the output of [summary_table()] we include SMD values for
+## four variables and include interactions up to order 3. Because
+## `suspect_age` is numeric it will not be included in the interactions.
 
-match_j_exp300_replace = matched_sample(
-   df = eg_data,
-   propscore_df = eg_j_exp300,
-   seed = 20,
-   replace = TRUE,
-   downsample = FALSE,
-   drop_int = FALSE
-   )
-
-## Finally we use `expand_matched_df` to expand this so that each row is
-## included `include` times
-
-match_j_exp300_replace |> expand_matched_df()
+summary_table(
+  df = eg_data,
+  propscore_df = eg_j_exp300,
+  seeds = 1:20,
+  smd_cols = c("suspect_age", "category", "risk_ass", "sus_age_bin"),
+  smd_order = 3,
+  downsample = TRUE,
+  replace = FALSE
+)
 
 }
 \seealso{

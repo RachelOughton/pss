@@ -24,90 +24,103 @@
 #' )
 #' @importFrom rlang .data
 
-pss_check_data = function(
-    df,
-    cov_cols,
-    arm_col,
-    intervention_level
-){
+pss_check_data <- function(
+  df,
+  cov_cols,
+  arm_col,
+  intervention_level
+) {
   # Check the names exist
 
-  if(!(any(names(df)==arm_col))){
+  if (!(any(names(df) == arm_col))) {
     stop(
       sprintf("There is no column named %s", arm_col)
     )
   }
 
-  if(sum(cov_cols %in% names(df)) != length(cov_cols)){
+  if (sum(cov_cols %in% names(df)) != length(cov_cols)) {
     stop(
-      sprintf("The following cov_col elements are missing from df: %s",
-              paste(cov_cols[!(cov_cols %in% names(df))] ,collapse = ","))
+      sprintf(
+        "The following cov_col elements are missing from df: %s",
+        paste(cov_cols[!(cov_cols %in% names(df))], collapse = ",")
+      )
     )
   }
 
   # Check the variables are factor variables
 
-  arm_levels = unlist(unique(df[ ,names(df) == arm_col]))
-  if(length(arm_levels)!=2){
+  arm_levels <- unlist(unique(df[, names(df) == arm_col]))
+  if (length(arm_levels) != 2) {
     stop(
-      sprintf("The arm_col variable %s should have two unique values, but yours has %g: %s" ,
-              arm_col, length(arm_levels), paste(arm_levels, collapse=", " ))
+      sprintf(
+        "The arm_col variable %s should have two unique values, but yours has %g: %s",
+        arm_col, length(arm_levels), paste(arm_levels, collapse = ", ")
+      )
     )
   }
-  if(!any(arm_levels == intervention_level)){
+  if (!any(arm_levels == intervention_level)) {
     stop(
-      sprintf("You have given %s as the intervention level of the column %s, but the levels in the data are %s",
-              intervention_level, arm_col, paste(arm_levels, collapse = ", "))
+      sprintf(
+        "You have given %s as the intervention level of the column %s, but the levels in the data are %s",
+        intervention_level, arm_col, paste(arm_levels, collapse = ", ")
+      )
     )
   }
-  comparison_level = arm_levels[arm_levels!=intervention_level]
+  comparison_level <- arm_levels[arm_levels != intervention_level]
   ## Create the correspondence between my default labels and theirs
-  df$arm_given = df[ ,names(df) == arm_col]
-  df$Arm = NA
-  df$Arm[df$arm_given == intervention_level] = "Intervention"
-  df$Arm[df$arm_given != intervention_level] = "Comparison"
+  df$arm_given <- df[, names(df) == arm_col]
+  df$Arm <- NA
+  df$Arm[df$arm_given == intervention_level] <- "Intervention"
+  df$Arm[df$arm_given != intervention_level] <- "Comparison"
 
   ## Check everything for covariates in cov_cols.
   ## Are they factor variables?
   ## Should I check for missing data?
 
-  n_covcols = length(cov_cols)
+  n_covcols <- length(cov_cols)
 
-  for (col_i in cov_cols){
-    col_i_vec = df[[col_i]]
-    if(any(is.na(col_i_vec))){
+  for (col_i in cov_cols) {
+    col_i_vec <- df[[col_i]]
+    if (any(is.na(col_i_vec))) {
       message(
-        sprintf("There are %g NA values in the %s column. These rows will be lost.",
-                sum(is.na(col_i_vec)), col_i)
+        sprintf(
+          "There are %g NA values in the %s column. These rows will be lost.",
+          sum(is.na(col_i_vec)), col_i
+        )
       )
     }
     ## Check that it is factor (or could be treated as such)
-#    if(require_factor){
-      if(!is.factor(col_i_vec)){
-        if(is.character(col_i_vec)){
-          col_i_fac = as.factor(col_i_vec)
-          warning(
-            sprintf("Column %s has been coerced to a factor with %g levels",
-                    col_i, nlevels(col_i_fac))
+    #    if(require_factor){
+    if (!is.factor(col_i_vec)) {
+      if (is.character(col_i_vec)) {
+        col_i_fac <- as.factor(col_i_vec)
+        warning(
+          sprintf(
+            "Column %s has been coerced to a factor with %g levels",
+            col_i, nlevels(col_i_fac)
           )
-        } else {
-          stop(
-            sprintf("Covariates should be factors, but %s is %s",
-                    col_i, class(col_i_vec))
+        )
+      } else {
+        stop(
+          sprintf(
+            "Covariates should be factors, but %s is %s",
+            col_i, class(col_i_vec)
           )
-        }
+        )
       }
-#    }
-
+    }
+    #    }
   }
 
   ## Need to actually lose the NAs (but only from cov_cols or arm_col)
   ## Ungroup is because my dataset was previously grouped by one of the ID variables.
   ## Hopefully testing with another dataset will show if this causes a problem
-  df_cols = df |> dplyr::ungroup() |> dplyr::select(tidyselect::all_of(c(cov_cols, arm_col)))
-  any_NA = apply(df_cols, 1, anyNA)
+  df_cols <- df |>
+    dplyr::ungroup() |>
+    dplyr::select(tidyselect::all_of(c(cov_cols, arm_col)))
+  any_NA <- apply(df_cols, 1, anyNA)
 
-  df = df[!any_NA, ]
+  df <- df[!any_NA, ]
 
   return(df)
 }
