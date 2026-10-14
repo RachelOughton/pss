@@ -26,6 +26,7 @@
 #' - `px_int`, the estimate of \eqn{p(x | Z=1)}
 #' - `px_comp`, the estimate of \eqn{p(x)}
 #' - `count_comp`, the number of cases in the comparison cohort
+#' - `count_int`, the number of cases in the intervention cohort
 #' - `PropScore`, which contains the estimated propensity score
 #' - Some further columns, depending on which method is used
 #'
@@ -210,6 +211,7 @@ propscores <- function(
 
   ## Find count_comp, which we will need later
   df_comp <- df |> dplyr::filter(Arm == "Comparison")
+  df_int <- df |> dplyr::filter(Arm == "Intervention")
 
   df_count_comp <- df_comp |>
     dplyr::group_by(dplyr::pick(tidyselect::all_of(cov_cols)), .drop = F) |>
@@ -217,7 +219,13 @@ propscores <- function(
       count_comp = dplyr::n()
     )
   df_out <- dplyr::left_join(df_out, df_count_comp, by = cov_cols)
-  df_out
+  df_count_int <- df_int |>
+    dplyr::group_by(dplyr::pick(tidyselect::all_of(cov_cols)), .drop = F) |>
+    dplyr::summarise(
+      count_int = dplyr::n()
+    )
+  df_out <- dplyr::left_join(df_out, df_count_int, by = cov_cols)
+  return(df_out)
 }
 
 

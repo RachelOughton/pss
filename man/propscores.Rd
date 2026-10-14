@@ -42,6 +42,7 @@ pz1_expectedN(n_pz1)
 \item \code{px_int}, the estimate of \eqn{p(x | Z=1)}
 \item \code{px_comp}, the estimate of \eqn{p(x)}
 \item \code{count_comp}, the number of cases in the comparison cohort
+\item \code{count_int}, the number of cases in the intervention cohort
 \item \code{PropScore}, which contains the estimated propensity score
 \item Some further columns, depending on which method is used
 }

@@ -1,24 +1,35 @@
 ---
 title: "pss: Propensity Score Sampling"
 output: rmarkdown::html_vignette
+bibliography: vignette.bib
 vignette: >
   %\VignetteIndexEntry{pss: Propensity Score Sampling}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
 
+
 ```{r, include = FALSE}
 knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>"
 )
+library(kableExtra)
+
+# Install 'pss' in R:
+# install.packages('pss', repos = c('https://racheloughton.r-universe.dev', 'https://cloud.r-project.org'))
 ```
+
+
+This vignette provides a comprehensive overview of the propensity score sampling workflow using the `pss` package. The methodology behind the approach is only described where it is relevant to the use of the code; for full details see @oughton26pss.
+
+
 
 ```{r setup}
 library(pss)
 ```
 
-# Introduction
+
 
 ## Example data
 
@@ -76,7 +87,16 @@ then proportions will be found for all combinations of `category` and `risk_ass`
 
 #### Specifying $p(Z=1)$
 
+Unlike $p(\mathbf{x}|Z=1)$ and $p(\mathbf{x})$, $p(Z=1)$ cannot be estimated from the data in `df`, but it does need to be specified to estimate the propensity scores. The function `propscores()` provides three approaches, specified via `pz1_fn` and its argument `n_pz1`. These are described in more detail in [the paper] but in summary
+
+  - `pz1_fn = pz1_rescale(n_pz1)` will set $p(Z=1)$ such that the largest propensity score (unless any are infinite) is `n_pz1`
+  - `pz1_fn = pz1_estimate(n_pz1)` allows the user to specify an estimate of $p(Z=1)$ directly, ie. $p(Z=1) =$`n_pz1`
+  - `pz1_fn = pz1_expectedN(n_pz1)` will set $p(Z=1)$ such that the expected size of the matched comparison group will be `n_pz1`
+  
+
 ### Examples
+
+We will first estimate propensity scores using the fully joint approach and an estimate of $p(Z=1) = 0.1$:
 
 ```{r}
 ps_joint_est01 = propscores(
@@ -89,6 +109,11 @@ ps_joint_est01 = propscores(
 )
 ```
 
+Notice that this warns us that there are NA values in two of the columns, leading to rows being lost. 
+
+
+Fully marginal approach, with $p(Z=1)$ set such that the largest estimated propensity score is 2:
+
 ```{r}
 ps_marg_resc15 = propscores(
   df = eg_data,
@@ -100,6 +125,23 @@ ps_marg_resc15 = propscores(
 )
 ```
 
+
+`risk_ass` and `category` treated jointly, and $p(Z=1)$ set such that the expected size of the matched comparison group is 300.
+
+Each of these has columns for every element of `cov_cols`, and columns `px_int`, `px_comp` and `PropScore`. They will also have other columns, depending on which methods were used. 
+
+Below we display the data frame `ps_joint_est01`. Notice that in one row (`HIGH`, `Theft_CD`, `40+`) the propensity score is `Inf`. This is because there are some such cases in the intervention group, but none in the comparison group, and so although the match sampling process requires some comparison cases, there are none to be sampled. There are also some rows (`MEDIUM`, `Theft / CD`, `Under 29` and `MEDIUM`, `Theft / CD`, `33-39`) for which there are no cases in the intervention cohort, and so no comparison cases will be sampled (and the propensity score is zero).
+
+```{r}
+ps_joint_est01 |>
+  dplyr::select(c("risk_ass", "category", "sus_age_bin", "px_int", "px_comp", "count_comp", "PropScore")) |>
+#  dplyr::select(c("risk_ass", "category", "sus_age_bin", "count_int", "count_comp", "PropScore")) |>
+  kable(digits = 3)
+```
+
+To avoid the arbitrary results of small numbers, but preserve a potential link between `category` and `risk_ass`, we might choose the partially marginal approach instead,
+
+
 ```{r}
 ps_mix_exp300 = propscores(
   df = eg_data,
@@ -109,6 +151,15 @@ ps_mix_exp300 = propscores(
   cov_dist = list(c("risk_ass", "category")),
   pz1_fn = pz1_expectedN(300)
 )
+```
+
+This has no infinite propensity scores
+
+```{r}
+ps_mix_exp300 |>
+  dplyr::select(c("risk_ass", "category", "sus_age_bin", "px_int", "px_comp", "PropScore")) |>
+  #  dplyr::select(c("risk_ass", "category", "sus_age_bin", "count_int", "count_comp", "PropScore")) |>
+  kable(digits = 3)
 ```
 
 
