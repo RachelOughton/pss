@@ -26,11 +26,11 @@ The rows will be ordered in descending order of \code{n_dropped}
 Display the treatment cases that will be dropped under a particular matched sample
 }
 \examples{
-## First use [propscore_df()] to create a propensity score data frame
+## First use [propscores()] to create a propensity score data frame
 ## This example uses the joint approach and specifies p(Z=1) such
 ## that the expected size of the comparison group is 300
 
-eg_j_exp300 <- propscore_df(
+eg_j_exp300 <- propscores(
   df = eg_data,
   cov_cols = c("risk_ass", "category", "sus_age_bin"),
   arm_col = "Arm",
@@ -46,7 +46,7 @@ eg_j_exp300 <- propscore_df(
 
 match_j_exp300_replace <- matched_sample(
   df = eg_data,
-  propscore_df = eg_j_exp300,
+  propscores = eg_j_exp300,
   seed = 20,
   replace = TRUE,
   downsample = FALSE,

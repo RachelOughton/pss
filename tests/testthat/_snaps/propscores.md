@@ -1,7 +1,7 @@
 # Joint, rescale to 1.5
 
     Code
-      propscore_df(df = eg_data, cov_cols = c("risk_ass", "category", "sus_age_bin"),
+      propscores(df = eg_data, cov_cols = c("risk_ass", "category", "sus_age_bin"),
       arm_col = "Arm", intervention_level = "Intervention", cov_dist = "joint",
       pz1_fn = pz1_rescale(1))
     Message
@@ -87,7 +87,7 @@
 # Marginal, estimate of 0.01
 
     Code
-      propscore_df(df = eg_data, cov_cols = c("risk_ass", "category", "sus_age_bin"),
+      propscores(df = eg_data, cov_cols = c("risk_ass", "category", "sus_age_bin"),
       arm_col = "Arm", intervention_level = "Intervention", cov_dist = "marginal",
       pz1_fn = pz1_estimate(0.01))
     Message
@@ -173,7 +173,7 @@
 # List, expected N of 300
 
     Code
-      propscore_df(df = eg_data, cov_cols = c("risk_ass", "category", "sus_age_bin"),
+      propscores(df = eg_data, cov_cols = c("risk_ass", "category", "sus_age_bin"),
       arm_col = "Arm", intervention_level = "Intervention", cov_dist = list(c(
         "risk_ass", "category")), pz1_fn = pz1_expectedN(300))
     Message

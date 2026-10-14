@@ -1,8 +1,8 @@
-## Tests for summary_table
+## Tests for candidates
 
-## Set up some propscore_df to use
+## Set up some propscores to use
 
-eg_j_est015 = propscore_df(
+eg_j_est015 = propscores(
   df = eg_data,
   cov_cols = c("risk_ass", "category", "sus_age_bin"),
   arm_col = "Arm",
@@ -12,7 +12,7 @@ eg_j_est015 = propscore_df(
 )
 
 
-eg_m_resc125 = propscore_df(
+eg_m_resc125 = propscores(
   df = eg_data,
   cov_cols = c("risk_ass", "category", "sus_age_bin"),
   arm_col = "Arm",
@@ -21,7 +21,7 @@ eg_m_resc125 = propscore_df(
   pz1_fn = pz1_rescale(1.25)
 )
 
-eg_mix_exp300 = propscore_df(
+eg_mix_exp300 = propscores(
   df = eg_data,
   cov_cols = c("risk_ass", "category", "sus_age_bin"),
   arm_col = "Arm",
@@ -34,9 +34,9 @@ eg_mix_exp300 = propscore_df(
 
 test_that("Joint, estimate 0.15", {
   expect_snapshot(
-    summary_table(
+    candidates(
       df = eg_data,
-      propscore_df = eg_j_est015,
+      propscores = eg_j_est015,
       seeds = 3*(1:10),
       smd_cols = c("risk_ass", "category", "sus_age_bin"),
       smd_order = 2
@@ -46,9 +46,9 @@ test_that("Joint, estimate 0.15", {
 
 test_that("Marginal, rescale to 1.25", {
   expect_snapshot(
-    summary_table(
+    candidates(
       df = eg_data,
-      propscore_df = eg_m_resc125,
+      propscores = eg_m_resc125,
       seeds = 3*(1:10),
       smd_cols = c("risk_ass", "category", "sus_age_bin"),
       smd_order = 2
@@ -57,9 +57,9 @@ test_that("Marginal, rescale to 1.25", {
 
 test_that("semi-marginal, expectedN 300", {
   expect_snapshot(
-    summary_table(
+    candidates(
       df = eg_data,
-      propscore_df = eg_mix_exp300,
+      propscores = eg_mix_exp300,
       seeds = 3*(1:10),
       smd_cols = c("risk_ass", "category", "sus_age_bin", "suspect_age"),
       smd_order = 2

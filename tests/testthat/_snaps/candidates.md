@@ -1,7 +1,7 @@
 # Joint, estimate 0.15
 
     Code
-      summary_table(df = eg_data, propscore_df = eg_j_est015, seeds = 3 * (1:10),
+      candidates(df = eg_data, propscores = eg_j_est015, seeds = 3 * (1:10),
       smd_cols = c("risk_ass", "category", "sus_age_bin"), smd_order = 2)
     Condition
       Warning:
@@ -41,7 +41,7 @@
 # Marginal, rescale to 1.25
 
     Code
-      summary_table(df = eg_data, propscore_df = eg_m_resc125, seeds = 3 * (1:10),
+      candidates(df = eg_data, propscores = eg_m_resc125, seeds = 3 * (1:10),
       smd_cols = c("risk_ass", "category", "sus_age_bin"), smd_order = 2)
     Condition
       Warning:
@@ -81,7 +81,7 @@
 # semi-marginal, expectedN 300
 
     Code
-      summary_table(df = eg_data, propscore_df = eg_mix_exp300, seeds = 3 * (1:10),
+      candidates(df = eg_data, propscores = eg_mix_exp300, seeds = 3 * (1:10),
       smd_cols = c("risk_ass", "category", "sus_age_bin", "suspect_age"), smd_order = 2)
     Condition
       Warning:

@@ -1,9 +1,9 @@
 #' Create a summary table for a vector of seeds
 #'
 #'
-#' @name summary_table
+#' @name candidates
 #' @param df A data frame from which to generate matched samples
-#' @param propscore_df A data frame (created by [propscore_df()], or with the same format) giving a propensity score (in column `PropScore`) for every covariate being matched on
+#' @param propscores A data frame (created by [propscores()], or with the same format) giving a propensity score (in column `PropScore`) for every covariate being matched on
 #' @param seeds A vector of random seeds to be used
 #' @param smd_cols A character vector of columns for which to assess balance. This can be the same as `cov_cols` but it doens't have to be.
 #' @param smd_order An integer denoting the highest order of interaction for which to calculate the standardised mean difference (SMD)
@@ -11,12 +11,12 @@
 #' @param downsample logical. Passed to [matched_sample()]. Should the treatment cases be downsampled when there aren't enough comparison cases? Only one of `replace` and `downsample` should be TRUE.
 #' @param drop_int logical. Passed to [matched_sample()]. Should cases in the intervention/treated group be dropped if there are no equivalent cases in the comparison cohort to sample from?
 
-#' @param use_attr logical. Should the attributes of `propscore_df` (set by [propscore_df()]) be used to specify `cov_cols`, `arm_col` and `intervention_level`? Default `TRUE`
+#' @param use_attr logical. Should the attributes of `propscores` (set by [propscores()]) be used to specify `cov_cols`, `arm_col` and `intervention_level`? Default `TRUE`
 #' @param cov_cols (only specify if `use_attr == FALSE`) A character vector containing the column names of the covariates to be matched on. These should all be factor / categorical data.
 #' @param arm_col (only specify if `use_attr == FALSE`) The name of the column indicating which rows are treated cases and which are comparison cases. These should be factor or character, with only two levels / options.
 #' @param intervention_level (only specify if `use_attr == FALSE`) The value in the `arm_col` for the treatment cases
 
-#' @return [summary_table()] returns a data frame with a row for each random seed and columns
+#' @return [candidates()] returns a data frame with a row for each random seed and columns
 #' - seed
 #' - `n_int`: the number of treated / intervention cases included in the matched sample for that seed
 #' - `n_comp`: the number of comparison cases included in the matched sample for that seed
@@ -26,11 +26,11 @@
 #' @seealso [matched_sample()], [expand_matched_df()]
 #'
 #' @examples
-#' ## First use `propscore_df` to create a propensity score data frame
+#' ## First use `propscores` to create a propensity score data frame
 #' ## This example uses the joint approach and specifies p(Z=1) such
 #' ## that the expected size of the comparison group is 300
 #'
-#' eg_j_exp300 <- propscore_df(
+#' eg_j_exp300 <- propscores(
 #'   df = eg_data,
 #'   cov_cols = c("risk_ass", "category", "sus_age_bin"),
 #'   arm_col = "Arm",
@@ -40,17 +40,17 @@
 #' )
 #'
 #' ## Now we can use `eg_j_exp300` to find a matched comparison group
-#' ## for each seed in the vector `seeds`. [summary_table()] calls
+#' ## for each seed in the vector `seeds`. [candidates()] calls
 #' ## [matched_sample()] each time it does this, and we specify that
 #' ## it should downsample the intervention cases (`downsample = TRUE`)
 #' ## rather than sampling from the comparison cases with replacement.
-#' ## In the output of [summary_table()] we include SMD values for
+#' ## In the output of [candidates()] we include SMD values for
 #' ## four variables and include interactions up to order 3. Because
 #' ## `suspect_age` is numeric it will not be included in the interactions.
 #'
-#' summary_table(
+#' candidates(
 #'   df = eg_data,
-#'   propscore_df = eg_j_exp300,
+#'   propscores = eg_j_exp300,
 #'   seeds = 1:20,
 #'   smd_cols = c("suspect_age", "category", "risk_ass", "sus_age_bin"),
 #'   smd_order = 3,
@@ -64,9 +64,9 @@
 ## For C-stat, do a min and max case (not sure completely how right now)
 ## Do I want some kind of progress bar? I don't think I want to rely on another package
 ## but I could use the length of seeds (ie. if it's over 50 then print what percentage done for 10% bands?)
-summary_table <- function(
+candidates <- function(
   df,
-  propscore_df,
+  propscores,
   seeds,
   smd_cols,
   smd_order,
@@ -80,7 +80,7 @@ summary_table <- function(
 ) {
   n_seeds <- length(seeds)
 
-  ## Check some things specific to summary_table (lots will be checked by matched_sample)
+  ## Check some things specific to candidates (lots will be checked by matched_sample)
   df_out <- data.frame(
     seed = seeds,
     n_int = rep(NA, n_seeds),
@@ -119,7 +119,7 @@ summary_table <- function(
     }
     df_j <- matched_sample(
       df = df,
-      propscore_df = propscore_df,
+      propscores = propscores,
       cov_cols = cov_cols,
       use_attr = use_attr,
       arm_col = arm_col,

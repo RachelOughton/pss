@@ -6,31 +6,31 @@
 \usage{
 matched_sample(
   df,
-  propscore_df,
+  propscores,
   seed,
-  use_attr = TRUE,
   replace = TRUE,
   downsample = FALSE,
   drop_int = FALSE,
+  use_attr = TRUE,
   cov_cols = NULL,
   arm_col = NULL,
   intervention_level = NULL
 )
 }
 \arguments{
-\item{df}{A data frame containing treatment group and comparison cohort data}
+\item{df}{A data frame containing treatment group and comparison cohort data. These should}
 
-\item{propscore_df}{A data frame with a column for each variable in \code{cov_cols} and a \code{PropScore} column giving the estimated propensity score for each combination of their levels. This should have been returned by \code{propscore_df}.}
+\item{propscores}{A data frame with a column for each variable in \code{cov_cols} and a \code{PropScore} column giving the estimated propensity score for each combination of their levels. This should (usually) have been created by \code{\link[=propscores]{propscores()}} using \code{df} as input.}
 
 \item{seed}{The random seed to be used, for reproducibility}
-
-\item{use_attr}{logical. Should the attributes of \code{propscore_df} (set by \code{\link[=propscore_df]{propscore_df()}}) be used to specify \code{cov_cols}, \code{arm_col} and \code{intervention_level}?}
 
 \item{replace}{logical. Should the comparison cases be sampled with replacement?}
 
 \item{downsample}{logical. Should the treatment cases be downsampled when there aren't enough comparison cases? Only one of \code{replace} and \code{downsample} should be TRUE.}
 
 \item{drop_int}{logical. Should cases in the intervention/treated group be dropped if there are no equivalent cases in the comparison cohort to sample from?}
+
+\item{use_attr}{logical. Should the attributes of \code{propscores} (set by \code{\link[=propscores]{propscores()}}) be used to specify \code{cov_cols}, \code{arm_col} and \code{intervention_level}?}
 
 \item{cov_cols}{(only specify if \code{use_attr == FALSE}) A character vector containing the column names of the covariates to be matched on. These should all be factor / categorical data.}
 
@@ -39,12 +39,17 @@ matched_sample(
 \item{intervention_level}{(only specify if \code{use_attr == FALSE}) The value in the \code{arm_col} for the treatment cases}
 }
 \value{
-\code{\link[=matched_sample]{matched_sample()}} returns a data frame that is an expanded form of \code{df}, with the same number of rows, in the same order, but some extra columns:
+\code{\link[=matched_sample]{matched_sample()}} returns a data frame that is an expanded form of \code{df}, with the same number of rows, in the same order, but with some extra columns added:
 \itemize{
-\item \code{PropScore}: the propensity score for that row, from \code{propscore_df}
+\item \code{PropScore}: the propensity score for that row, from \code{propscores}
 \item \code{include}: how many copies of this row are included in the matched dataset. Zero means the row has been dropped. Values greater than one mean the row will be duplicated.
 \item \code{seed}: the random seed that was used. This will be the same for all rows and is included in the output for reproducibility.
+}
+
+The data frame can be expanded into a usable data frame (that is, with row \code{i} included \code{include[i]} times) using \code{\link[=expand_matched_df]{expand_matched_df()}}.
+
 \code{\link[=matched_sample]{matched_sample()}} will also issue messages indicating:
+\itemize{
 \item How many comparison cases have been repeated (and how many times) if \code{replace == TRUE}
 \item How many intervention cases have been downsampled, if \code{downsample == TRUE}
 \item How many (if any) intervention cases have been dropped because there are no similar comparison cases to sample from, if \code{drop_int == TRUE}
@@ -52,15 +57,15 @@ matched_sample(
 }
 }
 \description{
-Generate a matched sample using the propensity score sampling approach
+\code{\link[=matched_sample]{matched_sample()}} uses propensity score sampling to generate a matched sample.
 }
 \examples{
 
-## First use `propscore_df` to create a propensity score data frame
+## First use `propscores` to create a propensity score data frame
 ## This example uses the joint approach and specifies p(Z=1) such
 ## that the expected size of the comparison group is 300
 
-eg_j_exp300 <- propscore_df(
+eg_j_exp300 <- propscores(
   df = eg_data,
   cov_cols = c("risk_ass", "category", "sus_age_bin"),
   arm_col = "Arm",
@@ -70,13 +75,13 @@ eg_j_exp300 <- propscore_df(
 )
 
 ## Now we can use `eg_j_exp300` to find a matched comparison group
-## In this example we use the attribute information in `propscore_df`,
+## In this example we use the attribute information in `propscores`,
 ## we sample from the comparison group with replacement
 ## and do not drop any intervention cases for which there are no
 ## comparison cases to sample
 match_j_exp300_replace <- matched_sample(
   df = eg_data,
-  propscore_df = eg_j_exp300,
+  propscores = eg_j_exp300,
   seed = 20,
   replace = TRUE,
   downsample = FALSE,

@@ -1,22 +1,27 @@
 #' Form a matched sample
 #'
-#' Generate a matched sample using the propensity score sampling approach
+#' @description
+#' [matched_sample()] uses propensity score sampling to generate a matched sample.
+#'
 #' @name matched_sample
-#' @param df A data frame containing treatment group and comparison cohort data
-#' @param propscore_df A data frame with a column for each variable in `cov_cols` and a `PropScore` column giving the estimated propensity score for each combination of their levels. This should have been returned by `propscore_df`.
+#' @param df A data frame containing treatment group and comparison cohort data. These should
+#' @param propscores A data frame with a column for each variable in `cov_cols` and a `PropScore` column giving the estimated propensity score for each combination of their levels. This should (usually) have been created by [propscores()] using `df` as input.
 #' @param seed The random seed to be used, for reproducibility
-#' @param use_attr logical. Should the attributes of `propscore_df` (set by [propscore_df()]) be used to specify `cov_cols`, `arm_col` and `intervention_level`?
 #' @param replace logical. Should the comparison cases be sampled with replacement?
 #' @param downsample logical. Should the treatment cases be downsampled when there aren't enough comparison cases? Only one of `replace` and `downsample` should be TRUE.
 #' @param drop_int logical. Should cases in the intervention/treated group be dropped if there are no equivalent cases in the comparison cohort to sample from?
+#' @param use_attr logical. Should the attributes of `propscores` (set by [propscores()]) be used to specify `cov_cols`, `arm_col` and `intervention_level`?
 #' @param cov_cols (only specify if `use_attr == FALSE`) A character vector containing the column names of the covariates to be matched on. These should all be factor / categorical data.
 #' @param arm_col (only specify if `use_attr == FALSE`) The name of the column indicating which rows are treated cases and which are comparison cases. These should be factor or character, with only two levels / options.
 #' @param intervention_level (only specify if `use_attr == FALSE`) The value in the `arm_col` for the treatment cases
 #'
-#' @return [matched_sample()] returns a data frame that is an expanded form of `df`, with the same number of rows, in the same order, but some extra columns:
-#' - `PropScore`: the propensity score for that row, from `propscore_df`
+#' @return [matched_sample()] returns a data frame that is an expanded form of `df`, with the same number of rows, in the same order, but with some extra columns added:
+#' - `PropScore`: the propensity score for that row, from `propscores`
 #' - `include`: how many copies of this row are included in the matched dataset. Zero means the row has been dropped. Values greater than one mean the row will be duplicated.
 #' - `seed`: the random seed that was used. This will be the same for all rows and is included in the output for reproducibility.
+#'
+#' The data frame can be expanded into a usable data frame (that is, with row `i` included `include[i]` times) using [expand_matched_df()].
+#'
 #' [matched_sample()] will also issue messages indicating:
 #'  - How many comparison cases have been repeated (and how many times) if `replace == TRUE`
 #'   - How many intervention cases have been downsampled, if `downsample == TRUE`
@@ -29,11 +34,11 @@
 #'
 #' @examples
 #'
-#' ## First use `propscore_df` to create a propensity score data frame
+#' ## First use `propscores` to create a propensity score data frame
 #' ## This example uses the joint approach and specifies p(Z=1) such
 #' ## that the expected size of the comparison group is 300
 #'
-#' eg_j_exp300 <- propscore_df(
+#' eg_j_exp300 <- propscores(
 #'   df = eg_data,
 #'   cov_cols = c("risk_ass", "category", "sus_age_bin"),
 #'   arm_col = "Arm",
@@ -43,13 +48,13 @@
 #' )
 #'
 #' ## Now we can use `eg_j_exp300` to find a matched comparison group
-#' ## In this example we use the attribute information in `propscore_df`,
+#' ## In this example we use the attribute information in `propscores`,
 #' ## we sample from the comparison group with replacement
 #' ## and do not drop any intervention cases for which there are no
 #' ## comparison cases to sample
 #' match_j_exp300_replace <- matched_sample(
 #'   df = eg_data,
-#'   propscore_df = eg_j_exp300,
+#'   propscores = eg_j_exp300,
 #'   seed = 20,
 #'   replace = TRUE,
 #'   downsample = FALSE,
@@ -61,12 +66,12 @@
 
 matched_sample <- function(
   df,
-  propscore_df,
+  propscores,
   seed,
-  use_attr = TRUE,
   replace = TRUE,
   downsample = FALSE,
   drop_int = FALSE,
+  use_attr = TRUE,
   cov_cols = NULL,
   arm_col = NULL,
   intervention_level = NULL
@@ -85,9 +90,9 @@ matched_sample <- function(
     if (any((!is.null(cov_cols)) | (!is.null(arm_col)) | (!is.null(intervention_level)))) {
       stop("You have set use_attr = TRUE, so all of cov_cols, arm_col and intervention_level should be NULL")
     }
-    cov_cols <- attr(propscore_df, "cov_cols")
-    arm_col <- attr(propscore_df, "arm_col")
-    intervention_level <- attr(propscore_df, "intervention_level")
+    cov_cols <- attr(propscores, "cov_cols")
+    arm_col <- attr(propscores, "arm_col")
+    intervention_level <- attr(propscores, "intervention_level")
   } else if (!use_attr) {
     if (any((is.null(cov_cols)) | (is.null(arm_col)) | (is.null(intervention_level)))) {
       stop("You have set use_attr to FALSE so cov_cols, arm_col and intervention_level must all be specified")
@@ -101,15 +106,15 @@ matched_sample <- function(
     intervention_level = intervention_level
   )
 
-  ## Check that propscore_df has the right parts
+  ## Check that propscores has the right parts
 
   ps_df_names <- c(cov_cols, "PropScore")
-  if (any(!(ps_df_names %in% names(propscore_df)))) {
+  if (any(!(ps_df_names %in% names(propscores)))) {
     stop(
       sprintf(
-        "propscore_df should contain the columns %s. It does not contain %s",
+        "propscores should contain the columns %s. It does not contain %s",
         paste(ps_df_names, collapse = ", "),
-        paste(ps_df_names[!(ps_df_names %in% names(propscore_df))], collapse = ", ")
+        paste(ps_df_names[!(ps_df_names %in% names(propscores))], collapse = ", ")
       )
     )
   }
@@ -122,7 +127,7 @@ matched_sample <- function(
   ## Label by 0, 1 etc. so I can include multiples this way
   df$include <- 0
 
-  df <- dplyr::left_join(df, propscore_df, by = cov_cols)
+  df <- dplyr::left_join(df, propscores, by = cov_cols)
   if (replace) {
     for (i in 1:nrow(df)) {
       arm_i <- df[[arm_col]][i]
@@ -138,10 +143,11 @@ matched_sample <- function(
           }
         } else {
           if (ran_i <= prob_samp_i) {
+
             df$include[i] <- 1
           }
-        }
-      } else if (arm_i == "Intervention") {
+          }
+        } else if (arm_i == "Intervention") {
         ## Keep all of intervention cases (for now!)
         df$include[i] <- 1
       }

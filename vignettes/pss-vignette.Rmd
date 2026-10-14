@@ -17,3 +17,13 @@ knitr::opts_chunk$set(
 ```{r setup}
 library(pss)
 ```
+
+# Introduction
+
+# Propensity score sampling workflow
+
+## Estimating propensity scores (`propscores`)
+
+## Generating a collection of candidate matched samples (`candidates`)
+
+## Creating the final matched sample (`matched_sample`)

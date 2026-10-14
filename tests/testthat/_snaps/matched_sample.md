@@ -1,7 +1,7 @@
 # With replacement, not dropping
 
     Code
-      matched_sample(df = eg_data, propscore_df = eg_mix_exp100, cov_cols = c(
+      matched_sample(df = eg_data, propscores = eg_mix_exp100, cov_cols = c(
         "category", "risk_ass", "sus_age_bin"), arm_col = "Arm", use_attr = F,
       intervention_level = "Intervention", seed = 20, replace = T, downsample = F,
       drop_int = F)
@@ -33,8 +33,8 @@
 ---
 
     Code
-      matched_sample(df = eg_data, propscore_df = eg_m_resc15, cov_cols = c(
-        "category", "risk_ass", "sus_age_bin"), arm_col = "Arm", use_attr = F,
+      matched_sample(df = eg_data, propscores = eg_m_resc15, cov_cols = c("category",
+        "risk_ass", "sus_age_bin"), arm_col = "Arm", use_attr = F,
       intervention_level = "Intervention", seed = 20, replace = T, downsample = F,
       drop_int = F)
     Message
@@ -66,7 +66,7 @@
 ---
 
     Code
-      matched_sample(df = eg_data, propscore_df = eg_mix_exp100, seed = 20, replace = T,
+      matched_sample(df = eg_data, propscores = eg_mix_exp100, seed = 20, replace = T,
         downsample = F, drop_int = F)
     Message
       There are 1 NA values in the category column. These rows will be lost.
@@ -96,7 +96,7 @@
 ---
 
     Code
-      matched_sample(df = eg_data, propscore_df = eg_m_resc15, seed = 20, replace = T,
+      matched_sample(df = eg_data, propscores = eg_m_resc15, seed = 20, replace = T,
         downsample = F, drop_int = F)
     Message
       There are 1 NA values in the category column. These rows will be lost.
@@ -127,8 +127,8 @@
 # downsampling, dropping
 
     Code
-      matched_sample(df = eg_data, propscore_df = eg_m_resc15, cov_cols = c(
-        "category", "risk_ass", "sus_age_bin"), arm_col = "Arm", intervention_level = "Intervention",
+      matched_sample(df = eg_data, propscores = eg_m_resc15, cov_cols = c("category",
+        "risk_ass", "sus_age_bin"), arm_col = "Arm", intervention_level = "Intervention",
       use_attr = F, seed = 20, replace = F, downsample = T, drop_int = T)
     Message
       There are 1 NA values in the category column. These rows will be lost.
@@ -159,7 +159,7 @@
 ---
 
     Code
-      matched_sample(df = eg_data, propscore_df = eg_m_resc15, seed = 20, replace = F,
+      matched_sample(df = eg_data, propscores = eg_m_resc15, seed = 20, replace = F,
         downsample = T, drop_int = T)
     Message
       There are 1 NA values in the category column. These rows will be lost.
