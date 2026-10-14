@@ -31,7 +31,7 @@ library(pss)
 
 
 
-## Example data
+# Example data
 
 The example data are ...
 
@@ -42,9 +42,7 @@ eg_data$nprev_sus_bin[eg_data$nprev_sus > 1] = "2 plus"
 eg_data$nprev_sus_bin = factor(eg_data$nprev_sus_bin, levels = c("zero", "one", "2 plus"))
 ```
 
-# Propensity score sampling workflow
-
-## Estimating propensity scores (`propscores()`)
+# Estimating propensity scores (`propscores()`)
 
 In propensity score sampling, the propensity scores are estimated from the dataset using the frequencies of cases for each combination of covariate values. For this reason, `pss` currently only works for categorical variables, though continuous variables can be incorporated by binning them into ordinal variables.
 
@@ -54,14 +52,12 @@ $$ p\left(Z=1 \mid \mathbf{x}\right) = \frac{p\left(\mathbf{x}\mid Z=1\right)p(Z
 
 The function `propscores()` uses the data provided via the argument `df` to create a data frame containing the propensity score for each combination of covariate values
 
-### Approaches within `propscores()`
-
 There are two main choices to make when using `propscores()`:
 
   1. Do you want to use the covariates' joint distribution, marginal distributions, or some combination of sub-joint distributions (chosen via the argument `cov_dist`)?
   2. How do you want to specify $p(Z=1)$ (chosen via the argument `pz1_fn`)?
   
-#### Covariate distributions
+## Covariate distributions
 
 If `cov_dist = "joint"` then the joint density is used to estimate $p(\mathbf{x}|Z=1)$ and $p(\mathbf{x})$. That is, the number of cases is found for every combination of values of the covariates given in `cov_cols` for both trial arms. This is the most accurate approach, but may perform poorly if the number of cases is small relative to the number of covariates.
 
@@ -85,7 +81,7 @@ and
 then proportions will be found for all combinations of `category` and `risk_ass` (treating these two covariates jointly) for each arm. Proportions will also be found for each value of `sus_age_bin` and `nprev_sus_bin`. These proportions will be multiplied together to estimate $p(\mathbf{x}|Z=1)$ and $p(\mathbf{x})$. This approach gives a middle ground between the fully marginal and fully joint approaches.
 
 
-#### Specifying $p(Z=1)$
+## Specifying $p(Z=1)$
 
 Unlike $p(\mathbf{x}|Z=1)$ and $p(\mathbf{x})$, $p(Z=1)$ cannot be estimated from the data in `df`, but it does need to be specified to estimate the propensity scores. The function `propscores()` provides three approaches, specified via `pz1_fn` and its argument `n_pz1`. These are described in more detail in [the paper] but in summary
 
@@ -94,28 +90,62 @@ Unlike $p(\mathbf{x}|Z=1)$ and $p(\mathbf{x})$, $p(Z=1)$ cannot be estimated fro
   - `pz1_fn = pz1_expectedN(n_pz1)` will set $p(Z=1)$ such that the expected size of the matched comparison group will be `n_pz1`
   
 
-### Examples
+## Examples
 
 We will first estimate propensity scores using the fully joint approach and an estimate of $p(Z=1) = 0.1$:
 
 ```{r}
-ps_joint_est01 = propscores(
+ps_joint_est025 = propscores(
   df = eg_data,
   cov_cols = c("risk_ass", "category", "sus_age_bin"),
   arm_col = "Arm",
   intervention_level = "Intervention",
   cov_dist = "joint",
-  pz1_fn = pz1_estimate(0.1)
+  pz1_fn = pz1_estimate(0.25)
 )
 ```
 
 Notice that this warns us that there are NA values in two of the columns, leading to rows being lost. 
 
+Each of these has columns for every element of `cov_cols`, and columns `px_int`, `px_comp` and `PropScore`. They will also have other columns, depending on which methods were used. 
 
-Fully marginal approach, with $p(Z=1)$ set such that the largest estimated propensity score is 2:
+Below we display the data frame `ps_joint_est025`. Notice that in one row (`HIGH`, `Theft_CD`, `40+`) the propensity score is `Inf`. This is because there are some such cases in the intervention group, but none in the comparison group, and so although the match sampling process requires some comparison cases, there are none to be sampled. There are also some rows (`MEDIUM`, `Theft / CD`, `Under 29` and `MEDIUM`, `Theft / CD`, `33-39`) for which there are no cases in the intervention cohort, and so no comparison cases will be sampled (and the propensity score is zero).
 
 ```{r}
-ps_marg_resc15 = propscores(
+ps_joint_est025 |>
+  dplyr::select(c("risk_ass", "category", "sus_age_bin", "px_int", "px_comp", "count_comp", "PropScore")) |>
+#  dplyr::select(c("risk_ass", "category", "sus_age_bin", "count_int", "count_comp", "PropScore")) |>
+  kable(digits = 3)
+```
+
+To avoid the arbitrary results of small numbers, but preserve a potential link between `category` and `risk_ass`, we might choose the partially marginal approach instead (for demonstration purposes we also switch to specifying $p(z=1)$ so that the expected size of the comparison group is 250),
+
+
+```{r}
+ps_mix_exp250 = propscores(
+  df = eg_data,
+  cov_cols = c("risk_ass", "category", "sus_age_bin"),
+  arm_col = "Arm",
+  intervention_level = "Intervention",
+  cov_dist = list(c("risk_ass", "category")),
+  pz1_fn = pz1_expectedN(250)
+)
+```
+
+This has no infinite propensity scores
+
+```{r}
+ps_mix_exp250 |>
+  dplyr::select(c("risk_ass", "category", "sus_age_bin", "px_int", "px_comp", "PropScore")) |>
+  #  dplyr::select(c("risk_ass", "category", "sus_age_bin", "count_int", "count_comp", "PropScore")) |>
+  kable(digits = 3)
+```
+
+An alternative would be to adopt the fully marginal approach (changing the method for $p(Z=1)$ again for demonstration purposes, now fixing $p(Z=1)$ so that the largest propensity score is 2)
+
+
+```{r}
+ps_marg_resc2 = propscores(
   df = eg_data,
   cov_cols = c("risk_ass", "category", "sus_age_bin", "nprev_sus_bin"),
   arm_col = "Arm",
@@ -125,45 +155,31 @@ ps_marg_resc15 = propscores(
 )
 ```
 
+# Generating a collection of candidate matched samples (`candidates`)
 
-`risk_ass` and `category` treated jointly, and $p(Z=1)$ set such that the expected size of the matched comparison group is 300.
+Because propensity score sampling uses random sampling, we can generate many candidate matched samples and choose the best. This is not a problem for inference unless we involve the outcome values in the process.
 
-Each of these has columns for every element of `cov_cols`, and columns `px_int`, `px_comp` and `PropScore`. They will also have other columns, depending on which methods were used. 
+The main arguments to `candidates()` are
 
-Below we display the data frame `ps_joint_est01`. Notice that in one row (`HIGH`, `Theft_CD`, `40+`) the propensity score is `Inf`. This is because there are some such cases in the intervention group, but none in the comparison group, and so although the match sampling process requires some comparison cases, there are none to be sampled. There are also some rows (`MEDIUM`, `Theft / CD`, `Under 29` and `MEDIUM`, `Theft / CD`, `33-39`) for which there are no cases in the intervention cohort, and so no comparison cases will be sampled (and the propensity score is zero).
+  - `df`: a data frame of study data
+  - `propscores`: a propensity score data frame (output by `propscores()`)
+  - `seeds`: a vector of random seeds
 
-```{r}
-ps_joint_est01 |>
-  dplyr::select(c("risk_ass", "category", "sus_age_bin", "px_int", "px_comp", "count_comp", "PropScore")) |>
-#  dplyr::select(c("risk_ass", "category", "sus_age_bin", "count_int", "count_comp", "PropScore")) |>
-  kable(digits = 3)
-```
+There are also arguments to specify details of diagnostic summaries (`smd_cols`, `smd_order`) and to pass on to `matched_sample()`, which creates the candidate matched sample for each seed (`replace`, `downsample`, `drop_int`). 
 
-To avoid the arbitrary results of small numbers, but preserve a potential link between `category` and `risk_ass`, we might choose the partially marginal approach instead,
-
+## Examples
 
 ```{r}
-ps_mix_exp300 = propscores(
+candidates(
   df = eg_data,
-  cov_cols = c("risk_ass", "category", "sus_age_bin"),
-  arm_col = "Arm",
-  intervention_level = "Intervention",
-  cov_dist = list(c("risk_ass", "category")),
-  pz1_fn = pz1_expectedN(300)
+  propscores = ps_joint_est025,
+  seeds = 1:10,
+  smd_cols = c("risk_ass", "category", "sus_age_bin"),
+  smd_order = 2
 )
 ```
 
-This has no infinite propensity scores
 
-```{r}
-ps_mix_exp300 |>
-  dplyr::select(c("risk_ass", "category", "sus_age_bin", "px_int", "px_comp", "PropScore")) |>
-  #  dplyr::select(c("risk_ass", "category", "sus_age_bin", "count_int", "count_comp", "PropScore")) |>
-  kable(digits = 3)
-```
+# Creating the final matched sample (`matched_sample`)
 
 
-
-## Generating a collection of candidate matched samples (`candidates`)
-
-## Creating the final matched sample (`matched_sample`)
