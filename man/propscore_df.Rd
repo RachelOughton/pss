@@ -38,26 +38,32 @@ pz1_expectedN(n_pz1)
 \value{
 \code{propscore_df} returns a data frame (more detail here, including the columns! and attributes).
 
-\code{.props_fun} returns a function that creates a data frame containing \code{px_int} (p(x|Z=1)), \code{px_comp} (p(x) and \code{ratio} (\code{px_int / px_comp}) for every combination of the levels of the covariates in \code{cov_cols}, using the approach specified via \code{cov_dist}.
+\code{.props_fun} returns a function that creates a data frame containing \code{px_int} (\eqn{p(x|Z=1)} ), \code{px_comp} \eqn{p(x)}{p(x)} and \code{ratio} (\code{px_int / px_comp}) for every combination of the levels of the covariates in \code{cov_cols}, using the approach specified via \code{cov_dist}.
 
-\code{pz1_estimate} returns the estimate of p(Z=1) using the 'estimate' method (eg. a value provided by an expert). The argument is used as the estimate.
+\code{pz1_estimate} returns the estimate of \eqn{p(Z=1)} using the 'estimate' method (eg. a value provided by an expert). The argument is used as the estimate.
 
-\code{pz1_rescale} finds the value of p(Z=1) such that the largest propensity score will be \code{n_pz1} (the argument given to \code{pz1_fn})
+\code{pz1_rescale} finds the value of \eqn{p(Z=1)} such that the largest propensity score will be \code{n_pz1} (the argument given to \code{pz1_fn})
 
-\code{pz1_expectedN} finds the value of p(Z=1) such that the expected size of the matched comparison group will be \code{n_pz1} (the argument to \code{pz1_fn}).
+\code{pz1_expectedN} finds the value of \eqn{p(Z=1)} such that the expected size of the matched comparison group will be \code{n_pz1} (the argument to \code{pz1_fn}).
 }
 \description{
-Generate data frame of propensity score estimates to be used in sampling
+\code{\link[=propscore_df]{propscore_df()}} generates a data frame of propensity score estimates from study / trial data, to be used in the propensity score sampling method, using the Bayes Theorem factorisation of the propensity score
+\deqn{p(Z=1 \mid x) = \frac{p(x \mid Z=1) p(Z=1)}{p(x)}}{p(Z=1 | x) = p(x | Z=1)p(Z=1) / p(x)}
+
+Of the functions listed, only \code{\link[=propscore_df]{propscore_df()}} should be used directly.
+
+\code{\link[=.props_fun]{.props_fun()}} is called by \code{\link[=propscore_df]{propscore_df()}}
+to find the proportions of the data within each category for each arm. One of \code{\link[=pz1_estimate]{pz1_estimate()}}, \code{\link[=pz1_rescale]{pz1_rescale()}} or \code{\link[=pz1_expectedN]{pz1_expectedN()}} should be given (with its own argument \code{n_pz1}) as the \code{pz1_fn} argument, to determine which method is used to specify \eqn{p(Z=1)}{p(Z=1)}.
 }
 \section{Functions}{
 \itemize{
-\item \code{.props_fun()}: Find table of estimates of p(x), p(x|Z=1) and their ratio using fully joint approach
+\item \code{.props_fun()}: Find table of estimates of \eqn{p(x)}{p(x)}, \eqn{p(x|Z=1)} and their ratio using fully joint approach
 
-\item \code{pz1_estimate()}: Specify p(Z=1) using the estimate method. The argument given is the estimate used
+\item \code{pz1_estimate()}: Specify \eqn{p(Z=1)} using the estimate method. The argument given is the estimate used
 
-\item \code{pz1_rescale()}: Specify p(Z=1) using the rescale method. The argument given is the value the largest estimated propensity score should take
+\item \code{pz1_rescale()}: Specify \eqn{p(Z=1)} using the rescale method. The argument given is the value the largest estimated propensity score should take
 
-\item \code{pz1_expectedN()}: Specify p(Z=1) using the expectedN method. The argument given should be the expected size of the matched comparison group
+\item \code{pz1_expectedN()}: Specify \eqn{p(Z=1)} using the expectedN method. The argument given should be the expected size of the matched comparison group
 
 }}
 \examples{
