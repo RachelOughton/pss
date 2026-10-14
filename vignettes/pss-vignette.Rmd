@@ -20,9 +20,98 @@ library(pss)
 
 # Introduction
 
+## Example data
+
+The example data are ...
+
+```{r, echo=F}
+eg_data$nprev_sus_bin = "zero"
+eg_data$nprev_sus_bin[eg_data$nprev_sus > 0] = "one"
+eg_data$nprev_sus_bin[eg_data$nprev_sus > 1] = "2 plus"
+eg_data$nprev_sus_bin = factor(eg_data$nprev_sus_bin, levels = c("zero", "one", "2 plus"))
+```
+
 # Propensity score sampling workflow
 
-## Estimating propensity scores (`propscores`)
+## Estimating propensity scores (`propscores()`)
+
+In propensity score sampling, the propensity scores are estimated from the dataset using the frequencies of cases for each combination of covariate values. For this reason, `pss` currently only works for categorical variables, though continuous variables can be incorporated by binning them into ordinal variables.
+
+The propensity score is the probability of some eligible participant (or study unit, eg. neighbourhood) being given the intervention, if it is generally available ($Z=1$), given their characteristics ($\mathbf{x}$). We factorise the propensity score using Bayes Theorem
+
+$$ p\left(Z=1 \mid \mathbf{x}\right) = \frac{p\left(\mathbf{x}\mid Z=1\right)p(Z=1)}{p(\mathbf{x})}.$$
+
+The function `propscores()` uses the data provided via the argument `df` to create a data frame containing the propensity score for each combination of covariate values
+
+### Approaches within `propscores()`
+
+There are two main choices to make when using `propscores()`:
+
+  1. Do you want to use the covariates' joint distribution, marginal distributions, or some combination of sub-joint distributions (chosen via the argument `cov_dist`)?
+  2. How do you want to specify $p(Z=1)$ (chosen via the argument `pz1_fn`)?
+  
+#### Covariate distributions
+
+If `cov_dist = "joint"` then the joint density is used to estimate $p(\mathbf{x}|Z=1)$ and $p(\mathbf{x})$. That is, the number of cases is found for every combination of values of the covariates given in `cov_cols` for both trial arms. This is the most accurate approach, but may perform poorly if the number of cases is small relative to the number of covariates.
+
+If `cov_dist = "marginal"` then $p(\mathbf{x}|Z=1)$ and $p(\mathbf{x})$ are estimated using the marginal approximation
+
+\begin{align*}
+p\left(\mathbf{x}\mid Z=1\right) & = \prod\limits_{j=1}^k  p\left(x^{(j)}\mid Z=1\right) \\
+p\left(\mathbf{x}\right) & = \prod\limits_{j=1}^k  p\left(x^{(j)}\right).
+\end{align*}
+
+This is a strong assumption, since there will likely be some dependence between covariates, but it is more robust to empty combinations.
+
+Finally, one can specify sub-groups of covariates to be treated jointly by entering a list to `cov_dist`. For example, if we set 
+
+`cov_cols = c("category", "risk_ass", "sus_age_bin", "nprev_sus_bin")` 
+
+and 
+
+`cov_dist = list(c("category", "risk_ass"))`
+
+then proportions will be found for all combinations of `category` and `risk_ass` (treating these two covariates jointly) for each arm. Proportions will also be found for each value of `sus_age_bin` and `nprev_sus_bin`. These proportions will be multiplied together to estimate $p(\mathbf{x}|Z=1)$ and $p(\mathbf{x})$. This approach gives a middle ground between the fully marginal and fully joint approaches.
+
+
+#### Specifying $p(Z=1)$
+
+### Examples
+
+```{r}
+ps_joint_est01 = propscores(
+  df = eg_data,
+  cov_cols = c("risk_ass", "category", "sus_age_bin"),
+  arm_col = "Arm",
+  intervention_level = "Intervention",
+  cov_dist = "joint",
+  pz1_fn = pz1_estimate(0.1)
+)
+```
+
+```{r}
+ps_marg_resc15 = propscores(
+  df = eg_data,
+  cov_cols = c("risk_ass", "category", "sus_age_bin", "nprev_sus_bin"),
+  arm_col = "Arm",
+  intervention_level = "Intervention",
+  cov_dist = "marginal",
+  pz1_fn = pz1_rescale(2)
+)
+```
+
+```{r}
+ps_mix_exp300 = propscores(
+  df = eg_data,
+  cov_cols = c("risk_ass", "category", "sus_age_bin"),
+  arm_col = "Arm",
+  intervention_level = "Intervention",
+  cov_dist = list(c("risk_ass", "category")),
+  pz1_fn = pz1_expectedN(300)
+)
+```
+
+
 
 ## Generating a collection of candidate matched samples (`candidates`)
 
