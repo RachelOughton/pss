@@ -7,7 +7,7 @@
       There are 1 NA values in the category column. These rows will be lost.
       There are 1 NA values in the sus_age_bin column. These rows will be lost.
     Output
-      # A tibble: 997 x 21
+      # A tibble: 997 x 22
          victim_sex victim_age suspect_sex suspect_age reference_date      FM_equip
          <chr>           <dbl> <chr>             <dbl> <dttm>              <lgl>   
        1 F                  28 M                    35 2024-12-06 16:13:16 TRUE    
@@ -21,9 +21,9 @@
        9 F                  31 M                    28 2024-07-29 21:11:28 TRUE    
       10 F                  34 M                    36 2024-08-03 10:19:20 TRUE    
       # i 987 more rows
-      # i 15 more variables: warning_YN <chr>, risk_ass <fct>,
+      # i 16 more variables: warning_YN <chr>, risk_ass <fct>,
       #   protection_order <lgl>, princ_crime <chr>, category_new <fct>, phase <dbl>,
       #   nprev_sus <dbl>, n_fo_sus <int>, n_fo_dyad <lgl>, susprev_stalking <lgl>,
       #   susprev_vs_high <lgl>, Arm <chr>, category <fct>, sus_age_bin <fct>,
-      #   arm_given <tibble[,1]>
+      #   nprev_sus_bin <fct>, arm_given <tibble[,1]>
 

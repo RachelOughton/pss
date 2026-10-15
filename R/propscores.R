@@ -96,13 +96,20 @@ propscores <- function(
 
   ## Will need to sort this out in order to combine the three functions into the mixed one.
   ## create cov_dist_list for marginal and joint cases
-  if (tolower(cov_dist) == "marginal") {
+  if(is.list(cov_dist)){
+    cov_dist_vec = unlist(cov_dist)
+    if(any(!(cov_dist_vec) %in% cov_cols)){
+      stop(sprintf("You have included %s in cov_dist but not in cov_cols",
+                   cov_dist_vec[!(cov_dist_vec %in% cov_cols)]))
+    }
+    cov_dist_list <- cov_dist
+  } else if (tolower(cov_dist) == "marginal") {
     cov_dist_list <- as.list(cov_cols)
   } else if (tolower(cov_dist) == "joint") {
     cov_dist_list <- list()
     cov_dist_list[[1]] <- cov_cols
-  } else if (is.list(cov_dist)) {
-    cov_dist_list <- cov_dist
+  } else {
+    stop("`cov_list` needs to be either 'joint', 'marginal' or a list of character vectors of covariates to be treated jointly.")
   }
   df_out <- .props_fun(df, cov_cols, cov_dist_list)
 
@@ -186,11 +193,24 @@ propscores <- function(
   }
 
   ## This is probably quite ugly but it works
-  inner_text <- paste(sprintf("levels(df$%s)", cov_cols), collapse = ", ")
-  full_text <- paste0("df_probs_cov_list = expand.grid(", inner_text, ")")
-  eval(parse(text = full_text))
-  names(df_probs_cov_list) <- cov_cols
+  # inner_text <- paste(sprintf("levels(df$%s)", cov_cols), collapse = ", ")
+  # full_text <- paste0("df_probs_cov_list = expand.grid(", inner_text, ")")
+  # eval(parse(text = full_text))
+  # names(df_probs_cov_list) <- cov_cols
+  #
+  df_probs_cov_list <- do.call(
+    expand.grid,
+    c(
+      lapply(df[cov_cols], levels),
+      KEEP.OUT.ATTRS = FALSE,
+      stringsAsFactors = FALSE
+    )
+  )
+
   df_out <- df_probs_cov_list
+  for (covi in cov_cols){
+    df_out[[covi]] = factor(df_out[[covi]], levels = levels(df[[covi]]))
+  }
 
   for (i in 1:length(cov_list)) {
     df_out <- dplyr::left_join(df_out, df_cov_list[[i]], by = cov_list[[i]])

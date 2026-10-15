@@ -94,12 +94,13 @@ pss_check_data <- function(
     if (!is.factor(col_i_vec)) {
       if (is.character(col_i_vec)) {
         col_i_fac <- as.factor(col_i_vec)
-        warning(
+        message(
           sprintf(
             "Column %s has been coerced to a factor with %g levels",
             col_i, nlevels(col_i_fac)
           )
         )
+        df[[col_i]] = col_i_fac
       } else {
         stop(
           sprintf(

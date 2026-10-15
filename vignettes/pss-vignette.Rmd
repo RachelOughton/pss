@@ -97,7 +97,7 @@ We will first estimate propensity scores using the fully joint approach and an e
 ```{r}
 ps_joint_est025 = propscores(
   df = eg_data,
-  cov_cols = c("risk_ass", "category", "sus_age_bin"),
+  cov_cols = c("sus_age_bin", "category", "risk_ass"),
   arm_col = "Arm",
   intervention_level = "Intervention",
   cov_dist = "joint",
@@ -124,7 +124,7 @@ To avoid the arbitrary results of small numbers, but preserve a potential link b
 ```{r}
 ps_mix_exp250 = propscores(
   df = eg_data,
-  cov_cols = c("risk_ass", "category", "sus_age_bin"),
+  cov_cols = c("sus_age_bin", "category", "risk_ass"),
   arm_col = "Arm",
   intervention_level = "Intervention",
   cov_dist = list(c("risk_ass", "category")),
