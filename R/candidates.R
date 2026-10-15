@@ -79,6 +79,10 @@ candidates <- function(
   intervention_level = NULL
 ) {
   n_seeds <- length(seeds)
+  if(n_seeds == 0)
+    stop("Please supply a vector of seeds of length at least one")
+  if(length(smd_cols) == 0)
+    stop("Please supply a vector of covariate names for which to find the SMD")
 
   ## Check some things specific to candidates (lots will be checked by matched_sample)
   df_out <- data.frame(

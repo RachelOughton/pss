@@ -1,12 +1,7 @@
 # Joint, rescale to 1.5
 
     Code
-      propscores(df = eg_data, cov_cols = c("risk_ass", "category", "sus_age_bin"),
-      arm_col = "Arm", intervention_level = "Intervention", cov_dist = "joint",
-      pz1_fn = pz1_rescale(1))
-    Message
-      There are 1 NA values in the category column. These rows will be lost.
-      There are 1 NA values in the sus_age_bin column. These rows will be lost.
+      ps_test1
     Output
          risk_ass          category sus_age_bin p_int_risk_ass.category.sus_age_bin
       1    MEDIUM Course of conduct    Under 29                         0.035031847
@@ -87,12 +82,7 @@
 # Marginal, estimate of 0.01
 
     Code
-      propscores(df = eg_data, cov_cols = c("risk_ass", "category", "sus_age_bin"),
-      arm_col = "Arm", intervention_level = "Intervention", cov_dist = "marginal",
-      pz1_fn = pz1_estimate(0.01))
-    Message
-      There are 1 NA values in the category column. These rows will be lost.
-      There are 1 NA values in the sus_age_bin column. These rows will be lost.
+      ps_test2
     Output
          risk_ass          category sus_age_bin p_int_risk_ass p_comp_risk_ass
       1    MEDIUM Course of conduct    Under 29      0.2961783       0.6852123

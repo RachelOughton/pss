@@ -49,6 +49,14 @@ pss_check_data <- function(
 
   # Check the variables are factor variables
 
+  if(any(is.na(df[[arm_col]]))){
+    message(
+      sprintf(
+        "There are %g NA values in the %s column. These rows will be lost.",
+        sum(is.na(df[[arm_col]])), arm_col))
+    df = df |> tidyr::drop_na(all_of(arm_col))
+  }
+
   arm_levels <- unlist(unique(df[, names(df) == arm_col]))
   if (length(arm_levels) != 2) {
     stop(
@@ -72,6 +80,7 @@ pss_check_data <- function(
   df$Arm <- NA
   df$Arm[df$arm_given == intervention_level] <- "Intervention"
   df$Arm[df$arm_given != intervention_level] <- "Comparison"
+
 
   ## Check everything for covariates in cov_cols.
   ## Are they factor variables?

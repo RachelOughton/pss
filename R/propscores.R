@@ -145,17 +145,21 @@ propscores <- function(
 
   ## Check that all names in cov_list are in cov_cols, and none appears more than once
   cov_list_unlisted <- unlist(cov_list)
-  if (length(cov_list_unlisted) != length(unique(cov_list_unlisted))) {
-    stop("At least one covariate appears twice in cov_list")
-  }
-  if (any(!(cov_list_unlisted %in% cov_cols))) {
+  missing_covs <- setdiff(cov_list_unlisted, cov_cols)
+
+  if (length(missing_covs) > 0) {
     stop(
       sprintf(
-        "%s appears in cov_list but not in cov_cols",
-        cov_list_unlist[(cov_list_unlisted %in% cov_cols)]
+        "These covariates appear in cov_list but not in cov_cols: %s",
+        paste(missing_covs, collapse = ", ")
       )
     )
   }
+
+  if (length(cov_list_unlisted) != length(unique(cov_list_unlisted))) {
+    stop("At least one covariate appears twice in cov_list")
+  }
+
 
   ## Split dataset by arm
 
