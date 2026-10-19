@@ -15,10 +15,8 @@ Config/roxygen2/version: 8.1.0
 Imports: 
     dplyr,
     ggplot2,
-    kableExtra,
     rlang,
     smd,
-    testthat (>= 3.0.0),
     tidyr,
     tidyselect
 Suggests: 

@@ -14,7 +14,7 @@ knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>"
 )
-library(kableExtra)
+# library(kableExtra)
 
 # Install 'pss' in R:
 # install.packages('pss', repos = c('https://racheloughton.r-universe.dev', 'https://cloud.r-project.org'))
@@ -115,7 +115,7 @@ Below we display the data frame `ps_joint_est025`. Notice that in one row (`HIGH
 ps_joint_est025 |>
   dplyr::select(c("risk_ass", "category", "sus_age_bin", "px_int", "px_comp", "count_comp", "PropScore")) |>
 #  dplyr::select(c("risk_ass", "category", "sus_age_bin", "count_int", "count_comp", "PropScore")) |>
-  kable(digits = 3)
+  knitr::kable(digits = 3)
 ```
 
 To avoid the arbitrary results of small numbers, but preserve a potential link between `category` and `risk_ass`, we might choose the partially marginal approach instead (for demonstration purposes we also switch to specifying $p(z=1)$ so that the expected size of the comparison group is 250),
@@ -138,7 +138,7 @@ This has no infinite propensity scores
 ps_mix_exp250 |>
   dplyr::select(c("risk_ass", "category", "sus_age_bin", "px_int", "px_comp", "PropScore")) |>
   #  dplyr::select(c("risk_ass", "category", "sus_age_bin", "count_int", "count_comp", "PropScore")) |>
-  kable(digits = 3)
+  knitr::kable(digits = 3)
 ```
 
 An alternative would be to adopt the fully marginal approach (changing the method for $p(Z=1)$ again for demonstration purposes, now fixing $p(Z=1)$ so that the largest propensity score is 2)

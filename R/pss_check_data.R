@@ -54,7 +54,7 @@ pss_check_data <- function(
       sprintf(
         "There are %g NA values in the %s column. These rows will be lost.",
         sum(is.na(df[[arm_col]])), arm_col))
-    df = df |> tidyr::drop_na(all_of(arm_col))
+    df = df |> tidyr::drop_na(tidyselect::all_of(arm_col))
   }
 
   arm_levels <- unlist(unique(df[, names(df) == arm_col]))
