@@ -90,5 +90,5 @@ match_j_exp300_replace <- matched_sample(
 
 }
 \seealso{
-\code{\link[=expand_matched_df]{expand_matched_df()}}
+\code{\link[=expand_matched_df]{expand_matched_df()}} \code{\link[=dropped_cases]{dropped_cases()}}
 }

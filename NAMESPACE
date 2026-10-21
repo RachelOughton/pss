@@ -2,7 +2,7 @@
 
 export(.props_fun)
 export(candidates)
-export(dropped_df)
+export(dropped_cases)
 export(expand_matched_df)
 export(matched_sample)
 export(plot_smd)

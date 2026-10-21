@@ -1,10 +1,10 @@
 #' Display the treatment cases that will be dropped under a particular matched sample
 #'
-#' @name dropped_df
+#' @name dropped_cases
 #' @param matched_df A data frame output by [matched_sample()]. This should contain columns for `arm_col`, all elements of `cov_cols` and `include`. It must have the `Arm` column with levels `"Intervention"` and `"Comparison"`. It may also contain other columns.
 #' @param use_attr logical. Should the attributes of `matched_df` (set by [matched_sample()]) be used to specify `cov_cols`?
 #' @param cov_cols (only specify if `use_attr == FALSE`) A character vector containing the column names of the covariates to be matched on. These should all be factor / categorical data.
-#' @return [dropped_df()] returns a data frame with the following columns
+#' @return [dropped_cases()] returns a data frame with the following columns
 #' - A column for each of `cov_cols`
 #' - `n_dropped`: how many treated / intervention cases with this combination of `cov_cols` have been dropped / downsampled
 #' - `n_kept`: how many treated / intervention cases with this combination of `cov_cols` have been kept
@@ -40,15 +40,15 @@
 #'   drop_int = FALSE
 #' )
 #'
-#' ## Finally we use [dropped_df()] to summarise the treated / intervention
+#' ## Finally we use [dropped_cases()] to summarise the treated / intervention
 #' ## cases that have been dropped or downsampled
 #' ## included `include` times
 #'
-#' match_j_exp300_replace |> dropped_df()
+#' match_j_exp300_replace |> dropped_cases()
 #'
 #' @importFrom rlang .data
 
-dropped_df <- function(
+dropped_cases <- function(
   matched_df,
   use_attr = TRUE,
   cov_cols = NULL

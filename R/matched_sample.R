@@ -28,7 +28,7 @@
 #'   - How many (if any) intervention cases have been dropped because there are no similar comparison cases to sample from, if `drop_int == TRUE`
 #'   - How many (if any) intervention cases have been kept even though there are no similar comparison cases to sample from, if `drop_int == TRUE`
 #'
-#' @seealso [expand_matched_df()]
+#' @seealso [expand_matched_df()] [dropped_cases()]
 #' @export
 #' @importFrom stats runif
 #'
