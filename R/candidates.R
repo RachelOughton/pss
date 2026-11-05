@@ -102,6 +102,8 @@ candidates <- function(
     dplyr::select(smd_cols) |>
     lapply(class) |>
     unlist()
+  ## Removes grouping variable, which was messing up example
+  smd_col_classes = smd_col_classes[names(smd_col_classes) %in% smd_cols]
   if ((any(!(smd_col_classes %in% c("factor", "character")))) & (smd_order > 1)) {
     message(sprintf(
       "The interaction SMD will not include %s as it does not have class factor or character",
