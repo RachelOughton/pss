@@ -69,12 +69,12 @@ plot_smd = function(
   if(is.numeric(smd_thresh)){
    sdf_thresh = sdf |>
      dplyr::group_by(seed) |>
-     dplyr::mutate(maxSMD = max(SMD))
+     dplyr::summarise(maxSMD = max(SMD))
   sdf = dplyr::left_join(
     sdf,
     sdf_thresh |> dplyr::select(tidyselect::all_of(c("seed", "maxSMD"))),
     by = "seed")
-  sdf$alpha[sdf$maxSMD >= smd_thresh] = 0.5
+  sdf$alpha[sdf$maxSMD >= smd_thresh] = 0.3
   }
 
   plot_out = ggplot2::ggplot(
