@@ -72,7 +72,7 @@ plot_smd = function(
      dplyr::mutate(maxSMD = max(SMD))
   sdf = dplyr::left_join(
     sdf,
-    sdf_thresh |> dplyr::select(c("seed", "maxSMD")),
+    sdf_thresh |> dplyr::select(tidyselect::all_of(c("seed", "maxSMD"))),
     by = "seed")
   sdf$alpha[sdf$maxSMD >= smd_thresh] = 0.5
   }

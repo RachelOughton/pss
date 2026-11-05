@@ -79,6 +79,7 @@ candidates <- function(
   intervention_level = NULL
 ) {
   n_seeds <- length(seeds)
+  propscores = dplyr::ungroup(propscores)
   if(n_seeds == 0)
     stop("Please supply a vector of seeds of length at least one")
   if(length(smd_cols) == 0)
@@ -99,7 +100,7 @@ candidates <- function(
   }
 
   smd_col_classes <- df |>
-    dplyr::select(smd_cols) |>
+    dplyr::select(tidyselect::all_of(smd_cols)) |>
     lapply(class) |>
     unlist()
   ## Removes grouping variable, which was messing up example
@@ -135,7 +136,7 @@ candidates <- function(
       downsample = downsample,
       drop_int = drop_int
     ) |> suppressMessages()
-    df_j <- df_j |> expand_matched_df()
+    df_j <- df_j |> expand_matched_df() |> dplyr::ungroup()
 
     ## Need to do the match and make an expanded df!!
     df_out$n_int[j] <- sum(df_j$Arm == "Intervention")
@@ -169,7 +170,8 @@ candidates <- function(
 
       for (k in 1:nrow(eg_smd_sorted)) { # go through each interaction
         SMD_name_k <- sprintf("SMD_%s", paste(eg_smd_sorted[k, ], collapse = ".")) # name of new column
-        df_int_k <- df_j |> dplyr::select(as.character(eg_smd_sorted[k, ])) # data for new column
+        ## Next line is the one throwing the warning about grouping variables
+        df_int_k <- df_j |> dplyr::select(tidyselect::all_of(as.character(eg_smd_sorted[k, ]))) # data for new column
 
         df_int_k[[SMD_name_k]] <- sapply( # create single column for interaction (to be x in smd())
           1:nrow(df_j),

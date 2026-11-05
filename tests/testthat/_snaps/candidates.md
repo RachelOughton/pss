@@ -3,17 +3,6 @@
     Code
       candidates(df = eg_data, propscores = eg_j_est015, seeds = 3 * (1:10),
       smd_cols = c("risk_ass", "category", "sus_age_bin"), smd_order = 2)
-    Condition
-      Warning:
-      Using an external vector in selections was deprecated in tidyselect 1.1.0.
-      i Please use `all_of()` or `any_of()` instead.
-        # Was:
-        data %>% select(smd_cols)
-      
-        # Now:
-        data %>% select(all_of(smd_cols))
-      
-      See <https://tidyselect.r-lib.org/reference/faq-external-vector.html>.
     Output
          seed n_int n_comp SMD_risk_ass SMD_category SMD_sus_age_bin
       1     3   314     94  0.026854155   0.07615675      0.09533943
@@ -43,17 +32,6 @@
     Code
       candidates(df = eg_data, propscores = eg_m_resc125, seeds = 3 * (1:10),
       smd_cols = c("risk_ass", "category", "sus_age_bin"), smd_order = 2)
-    Condition
-      Warning:
-      Using an external vector in selections was deprecated in tidyselect 1.1.0.
-      i Please use `all_of()` or `any_of()` instead.
-        # Was:
-        data %>% select(smd_cols)
-      
-        # Now:
-        data %>% select(all_of(smd_cols))
-      
-      See <https://tidyselect.r-lib.org/reference/faq-external-vector.html>.
     Output
          seed n_int n_comp SMD_risk_ass SMD_category SMD_sus_age_bin
       1     3   314    271  0.002137366   0.07880662      0.12321196
@@ -83,17 +61,6 @@
     Code
       candidates(df = eg_data, propscores = eg_mix_exp300, seeds = 3 * (1:10),
       smd_cols = c("risk_ass", "category", "sus_age_bin", "suspect_age"), smd_order = 2)
-    Condition
-      Warning:
-      Using an external vector in selections was deprecated in tidyselect 1.1.0.
-      i Please use `all_of()` or `any_of()` instead.
-        # Was:
-        data %>% select(smd_cols)
-      
-        # Now:
-        data %>% select(all_of(smd_cols))
-      
-      See <https://tidyselect.r-lib.org/reference/faq-external-vector.html>.
     Message
       The interaction SMD will not include suspect_age as it does not have class factor or character
     Output
