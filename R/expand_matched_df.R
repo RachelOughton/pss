@@ -53,6 +53,9 @@ expand_matched_df <- function(
   if (!is.numeric(include_vec)) {
     stop("The 'include' column must be numeric, and include only non-negative integers.")
   }
+  if (anyNA(include_vec) || any(!is.finite(include_vec))) {
+    stop("'include' must contain finite, non-missing values.")
+  }
   remainder_include <- include_vec %% 1
   if ((any(remainder_include != 0)) | any(include_vec < 0)) {
     stop("The 'include' column must include only non-negative integers.")

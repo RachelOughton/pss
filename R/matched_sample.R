@@ -127,7 +127,7 @@ matched_sample <- function(
   df <- dplyr::left_join(df, propscores, by = cov_cols)
   if (tolower(sampling) == "repeat") {
     for (i in 1:nrow(df)) {
-      arm_i <- df[[arm_col]][i]
+      arm_i <- df$Arm[i]
       prob_samp_i <- as.numeric(df$PropScore[i])
 
       if (arm_i == "Comparison") {
@@ -164,7 +164,7 @@ matched_sample <- function(
     }
   } else if (tolower(sampling) == "downsample") {
     for (i in 1:nrow(df)) {
-      arm_i <- df[[arm_col]][i]
+      arm_i <- df$Arm[i]
       prob_samp_i <- as.numeric(df$PropScore[i])
 
       if (arm_i == "Comparison") {

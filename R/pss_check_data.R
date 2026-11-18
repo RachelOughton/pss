@@ -30,6 +30,7 @@ pss_check_data <- function(
   arm_col,
   intervention_level
 ) {
+  df <- df |> dplyr::ungroup()
   # Check the names exist
 
   if (!(any(names(df) == arm_col))) {

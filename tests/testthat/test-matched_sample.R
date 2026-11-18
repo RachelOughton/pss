@@ -172,4 +172,42 @@ test_that("equal1",{
   )
 })
 
+## Suggested by chat GPT, 18 Nov 2026
+
+
+test_that("matching works with non-standard treatment variable names", {
+
+  dat <- data.frame(
+    treatment = c("Yes", "Yes", "No", "No"),
+    x = factor(c("A", "B", "A", "B"))
+  )
+
+  ps <- propscores(
+    df = dat,
+    cov_cols = "x",
+    arm_col = "treatment",
+    intervention_level = "Yes",
+    cov_dist = "joint",
+    pz1_fn = pz1_rescale(1)
+  )
+
+  matched <- matched_sample(
+    df = dat,
+    propscores = ps,
+    seed = 123,
+    sampling = "repeat"
+  )
+
+  # All intervention cases should be retained
+  expect_equal(
+    sum(matched$include[matched$Arm == "Intervention"]),
+    2
+  )
+
+  # Both groups should be represented in the standardised Arm column
+  expect_true(all(c("Intervention", "Comparison") %in%
+                    unique(matched$Arm)))
+})
+
+
 

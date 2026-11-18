@@ -6,8 +6,7 @@ candidates(
   seeds = 1:10,
   smd_cols = c("suspect_age", "category", "risk_ass", "sus_age_bin"),
   smd_order = 1,
-  downsample = T,
-  replace = F
+  sampling = "downsample"
 )
 
 candidates(
@@ -16,8 +15,7 @@ candidates(
   seeds = 1:10,
   smd_cols = c("suspect_age", "category", "risk_ass", "sus_age_bin"),
   smd_order = 2,
-  downsample = T,
-  replace = F
+  sampling = "downsample"
 )
 
 candidates(
@@ -26,8 +24,7 @@ candidates(
   seeds = 1:10,
   smd_cols = c("suspect_age", "category", "risk_ass", "sus_age_bin"),
   smd_order = 3,
-  downsample = T,
-  replace = F
+  sampling = "downsample"
 )
 
 stdf= candidates(
@@ -36,8 +33,7 @@ stdf= candidates(
   seeds = 1:10,
   smd_cols = c("suspect_age", "category", "risk_ass", "sus_age_bin"),
   smd_order = 3,
-  downsample = T,
-  replace = F
+  sampling = "downsample"
 )
 
 ## Recreating failed test

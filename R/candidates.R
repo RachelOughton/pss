@@ -80,6 +80,12 @@ candidates <- function(
     stop("Please supply a vector of seeds of length at least one")
   if(length(smd_cols) == 0)
     stop("Please supply a vector of covariate names for which to find the SMD")
+  if(any(!(smd_cols %in% names(df)))){
+    smd_not_df = smd_cols[!(smd_cols %in% names(df))]
+    stop(sprintf("The following elements of smd_cols are not columns in df: %s", paste(smd_not_df, collapse = ",")))
+  }
+  if(smd_order > length(smd_cols))
+    stop("`smd_order` should not be greater than the number of covariates in `smd_cols`")
 
   ## Check some things specific to candidates (lots will be checked by matched_sample)
   df_out <- data.frame(

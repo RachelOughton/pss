@@ -131,5 +131,106 @@ test_that("equal1",{
   )
 })
 
+## Suggested by chat GPT, 18 Nov 2026
+
+
+test_that("plot_smd uses absolute SMD values for thresholding", {
+
+  summary_df <- data.frame(
+    seed = c(1, 2),
+    SMD_age = c(-0.25, 0.05),
+    SMD_risk = c(0.05, -0.08)
+  )
+
+  p <- plot_smd(
+    summary_df = summary_df,
+    smd_thresh = 0.1
+  )
+
+  # Seed 1 has an SMD of -0.25 and should be flagged
+  expect_equal(
+    unique(p$data$alpha[p$data$seed == 1]),
+    0.3
+  )
+
+  # Seed 2 has all SMDs within the threshold
+  expect_equal(
+    unique(p$data$alpha[p$data$seed == 2]),
+    1
+  )
+})
+
+
+
+test_that("expand_matched_df rejects missing include values", {
+
+  dat <- data.frame(
+    id = 1:2,
+    include = c(1, NA)
+  )
+
+  expect_error(
+    expand_matched_df(dat),
+    "missing|NA|finite"
+  )
+})
+
+
+test_that("expand_matched_df rejects infinite include values", {
+
+  dat <- data.frame(
+    id = 1:2,
+    include = c(1, Inf)
+  )
+
+  expect_error(
+    expand_matched_df(dat),
+    "missing|NA|finite"
+  )
+})
+
+
+test_that("expand_matched_df rejects fractional include values", {
+
+  dat <- data.frame(
+    id = 1:2,
+    include = c(1, 1.5)
+  )
+
+  expect_error(
+    expand_matched_df(dat)
+  )
+})
+
+
+test_that("expand_matched_df rejects negative include values", {
+
+  dat <- data.frame(
+    id = 1:2,
+    include = c(1, -1)
+  )
+
+  expect_error(
+    expand_matched_df(dat)
+  )
+})
+
+
+test_that("expand_matched_df correctly expands valid data", {
+
+  dat <- data.frame(
+    id = 1:3,
+    include = c(2, 0, 1)
+  )
+
+  result <- expand_matched_df(dat)
+
+  expect_equal(result$id, c(1, 1, 3))
+  expect_false("include" %in% names(result))
+})
+
+
+
+
 
 

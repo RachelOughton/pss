@@ -431,3 +431,107 @@ test_that("invalid covariate groups name the missing covariate", {
     "missing_variable"
   )
 })
+
+### As suggested by Chat GPT
+
+test_that("missing covariate combinations are handled correctly", {
+
+  dat <- data.frame(
+    group = c("treated", "treated", "control", "control"),
+    x = factor(c("A", "A", "B", "B"),
+               levels = c("A", "B"))
+  )
+
+  ps <- propscores(
+    df = dat,
+    cov_cols = "x",
+    arm_col = "group",
+    intervention_level = "treated",
+    cov_dist = "joint",
+    pz1_fn = pz1_rescale(1)
+  )
+
+  # There should be no missing probability estimates
+  expect_false(anyNA(ps$px_int))
+  expect_false(anyNA(ps$px_comp))
+
+  # A occurs only in the intervention group
+  expect_equal(ps$px_comp[ps$x == "A"], 0)
+  expect_true(is.infinite(ps$ratio[ps$x == "A"]))
+
+  # B occurs only in the comparison group
+  expect_equal(ps$px_int[ps$x == "B"], 0)
+  expect_equal(ps$ratio[ps$x == "B"], 0)
+
+  # The counts should also be correct
+  expect_equal(ps$count_int[ps$x == "A"], 2)
+  expect_equal(ps$count_comp[ps$x == "A"], 0)
+  expect_equal(ps$count_int[ps$x == "B"], 0)
+  expect_equal(ps$count_comp[ps$x == "B"], 2)
+})
+
+
+test_that("grouped and ungrouped input give identical propensity scores", {
+
+  dat <- data.frame(
+    group = rep(c("treated", "control"), each = 4),
+    cluster = rep(c("A", "B"), each = 2, times = 2),
+    x = factor(c("A", "A", "B", "B",
+                 "A", "B", "A", "B"))
+  )
+
+  ps_ungrouped <- propscores(
+    df = dat,
+    cov_cols = "x",
+    arm_col = "group",
+    intervention_level = "treated",
+    cov_dist = "joint",
+    pz1_fn = pz1_rescale(1)
+  )
+
+  ps_grouped <- propscores(
+    df = dplyr::group_by(dat, cluster),
+    cov_cols = "x",
+    arm_col = "group",
+    intervention_level = "treated",
+    cov_dist = "joint",
+    pz1_fn = pz1_rescale(1)
+  )
+
+  expect_equal(
+    dplyr::ungroup(ps_grouped),
+    dplyr::ungroup(ps_ungrouped)
+  )
+})
+
+
+
+test_that("pz1_expectedN gives the requested expected comparison sample size", {
+
+  dat <- data.frame(
+    group = c(
+      rep("treated", 4),
+      rep("control", 8)
+    ),
+    x = factor(c(
+      "A", "A", "B", "B",
+      "A", "A", "A", "B",
+      "B", "B", "B", "B"
+    ))
+  )
+
+  target_N <- 6
+
+  ps <- propscores(
+    df = dat,
+    cov_cols = "x",
+    arm_col = "group",
+    intervention_level = "treated",
+    cov_dist = "joint",
+    pz1_fn = pz1_expectedN(target_N)
+  )
+
+  expected_N <- sum(ps$count_comp * ps$PropScore)
+
+  expect_equal(expected_N, target_N)
+})

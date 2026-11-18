@@ -63,12 +63,14 @@ dropped_cases <- function(
       stop("Since use_attr is FALSE, cov_cols should be specified")
     }
   }
+  if(any(matched_df$include > 1))
+      warning("Some cases are being repeat-sampled in this matched data frame. The number kept will reflect this.")
   df_int <- matched_df |>
     dplyr::filter(Arm == "Intervention") |>
     dplyr::group_by(dplyr::pick(tidyselect::all_of(cov_cols))) |>
     dplyr::summarise(
-      n_dropped = sum(include == 0),
-      n_kept = sum(include == 1)
+      n_dropped = sum(include == 0, na.rm=T),
+      n_kept = sum(include, na.rm=T)
     )
   df_int <- df_int |> dplyr::arrange(dplyr::desc(n_dropped))
   return(df_int)

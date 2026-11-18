@@ -140,6 +140,7 @@ propscores <- function(
   cov_cols,
   cov_list
 ) {
+  df <- df |> dplyr::ungroup()
   # Try to solve no visible binding
   Arm <- count <- comb_int <- comb_comp <- cov_list_unlist <- NULL
 
@@ -218,6 +219,18 @@ propscores <- function(
 
   for (i in 1:length(cov_list)) {
     df_out <- dplyr::left_join(df_out, df_cov_list[[i]], by = cov_list[[i]])
+    ## Replace any NAs with zero
+    df_out <- df_out |>
+      dplyr::mutate(
+        dplyr::across(
+          dplyr::starts_with("p_int"),
+          ~ tidyr::replace_na(.x, 0)
+        ),
+        dplyr::across(
+          dplyr::starts_with("p_comp"),
+          ~ tidyr::replace_na(.x, 0)
+        )
+      )
   }
 
   ## Now we need to multiply all the rows starting 'p_int' and all the rows starting 'p_comp'
@@ -249,6 +262,18 @@ propscores <- function(
       count_int = dplyr::n()
     )
   df_out <- dplyr::left_join(df_out, df_count_int, by = cov_cols)
+  df_out <- df_out |>
+    dplyr::mutate(
+      dplyr::across(
+        dplyr::starts_with("count_int"),
+        ~ tidyr::replace_na(.x, 0)
+      ),
+      dplyr::across(
+        dplyr::starts_with("count_comp"),
+        ~ tidyr::replace_na(.x, 0)
+      )
+    )
+
   return(df_out)
 }
 
@@ -266,6 +291,8 @@ pz1_estimate <- function(
     df
   ) {
     pz1 <- n_pz1
+    if(pz1 < 0)
+        stop(sprintf("n_pz1 should be positive but you have entered %g", pz1))
     df$PropScore <- n_pz1 * df$ratio
     return(pz1)
   }
@@ -283,6 +310,9 @@ pz1_rescale <- function(
   pz1_fn <- function(
     df
   ) {
+    if(n_pz1 < 0)
+      stop(sprintf("n_pz1 should be positive but you have entered %g", pz1))
+
     df_finite <- df |> dplyr::filter(!is.infinite(.data$ratio))
     max_ratio <- max(df_finite$ratio)
     pz1 <- n_pz1 / max_ratio
@@ -301,6 +331,9 @@ pz1_expectedN <- function(
   pz1_fn <- function(
     df
   ) {
+    if(n_pz1 < 0)
+      stop(sprintf("n_pz1 should be positive but you have entered %g", pz1))
+
     ## should already have count_comp for every combination
     df_noninf <- df |> dplyr::filter(!is.infinite(.data$ratio))
     nj_rat <- df_noninf$count_comp * df_noninf$ratio

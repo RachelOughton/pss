@@ -51,7 +51,12 @@ plot_smd = function(
     smd_thresh = NULL
     ){
   ## Some checks - think about what could go wrong? Make sure there's a seed column, with unique seeds, and some SMD columns
-
+  if(!("seed" %in% names(summary_df)))
+    stop("The summary_df you have supplied does not have a `seed` column")
+  summary_smd = summary_df |>
+    dplyr::select(tidyselect::starts_with("SMD"))
+  if(ncol(summary_smd) == 0)
+    stop("This summary_df has no columns with names begining `SMD`")
 
   ## Start by pivoting longer so there is one SMD column and a 'cov' column
 
@@ -68,7 +73,7 @@ plot_smd = function(
   if(is.numeric(smd_thresh)){
    sdf_thresh = sdf |>
      dplyr::group_by(seed) |>
-     dplyr::summarise(maxSMD = max(SMD))
+     dplyr::summarise(maxSMD = max(abs(SMD), na.rm=TRUE))
   sdf = dplyr::left_join(
     sdf,
     sdf_thresh |> dplyr::select(tidyselect::all_of(c("seed", "maxSMD"))),
