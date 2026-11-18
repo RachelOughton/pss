@@ -8,8 +8,7 @@ matched_sample(
   df,
   propscores,
   seed,
-  replace = TRUE,
-  downsample = FALSE,
+  sampling = "repeat",
   drop_int = FALSE,
   use_attr = TRUE,
   cov_cols = NULL,
@@ -24,9 +23,7 @@ matched_sample(
 
 \item{seed}{The random seed to be used, for reproducibility}
 
-\item{replace}{logical. Should the comparison cases be sampled with replacement?}
-
-\item{downsample}{logical. Should the treatment cases be downsampled when there aren't enough comparison cases? Only one of \code{replace} and \code{downsample} should be TRUE.}
+\item{sampling}{character. What should happen when there aren't enough comparison cases to cover the treated cases. Should be one of \code{repeat} (to repeat-sample the comparison cases) and \code{downsample} (to drop treated cases)}
 
 \item{drop_int}{logical. Should cases in the intervention/treated group be dropped if there are no equivalent cases in the comparison cohort to sample from?}
 
@@ -50,8 +47,8 @@ The data frame can be expanded into a usable data frame (that is, with row \code
 
 \code{\link[=matched_sample]{matched_sample()}} will also issue messages indicating:
 \itemize{
-\item How many comparison cases have been repeated (and how many times) if \code{replace == TRUE}
-\item How many intervention cases have been downsampled, if \code{downsample == TRUE}
+\item How many comparison cases have been repeated (and how many times) if \code{sampling == "repeat"}
+\item How many intervention cases have been downsampled, if \code{sampling == "downsample"}
 \item How many (if any) intervention cases have been dropped because there are no similar comparison cases to sample from, if \code{drop_int == TRUE}
 \item How many (if any) intervention cases have been kept even though there are no similar comparison cases to sample from, if \code{drop_int == TRUE}
 }
@@ -76,15 +73,14 @@ eg_j_exp300 <- propscores(
 
 ## Now we can use `eg_j_exp300` to find a matched comparison group
 ## In this example we use the attribute information in `propscores`,
-## we sample from the comparison group with replacement
+## we sample from the comparison group with repeatment
 ## and do not drop any intervention cases for which there are no
 ## comparison cases to sample
-match_j_exp300_replace <- matched_sample(
+match_j_exp300_repeat <- matched_sample(
   df = eg_data,
   propscores = eg_j_exp300,
   seed = 20,
-  replace = TRUE,
-  downsample = FALSE,
+  sampling = "repeat",
   drop_int = FALSE
 )
 

@@ -10,8 +10,7 @@ candidates(
   seeds,
   smd_cols,
   smd_order,
-  replace = TRUE,
-  downsample = FALSE,
+  sampling = "repeat",
   drop_int = FALSE,
   use_attr = TRUE,
   cov_cols = NULL,
@@ -30,9 +29,7 @@ candidates(
 
 \item{smd_order}{An integer denoting the highest order of interaction for which to calculate the standardised mean difference (SMD)}
 
-\item{replace}{logical. Passed to \code{\link[=matched_sample]{matched_sample()}}. Should the comparison cases be sampled with replacement?}
-
-\item{downsample}{logical. Passed to \code{\link[=matched_sample]{matched_sample()}}. Should the treatment cases be downsampled when there aren't enough comparison cases? Only one of \code{replace} and \code{downsample} should be TRUE.}
+\item{sampling}{character. What should happen when there aren't enough comparison cases to cover the treated cases. Should be one of \code{repeat} (to repeat-sample the comparison cases) and \code{downsample} (to drop treated cases)}
 
 \item{drop_int}{logical. Passed to \code{\link[=matched_sample]{matched_sample()}}. Should cases in the intervention/treated group be dropped if there are no equivalent cases in the comparison cohort to sample from?}
 
@@ -73,8 +70,8 @@ eg_j_exp300 <- propscores(
 ## Now we can use `eg_j_exp300` to find a matched comparison group
 ## for each seed in the vector `seeds`. [candidates()] calls
 ## [matched_sample()] each time it does this, and we specify that
-## it should downsample the intervention cases (`downsample = TRUE`)
-## rather than sampling from the comparison cases with replacement.
+## it should downsample the intervention cases (`sampling = "downsample"`)
+## rather than repeat-sampling from the comparison cases.
 ## In the output of [candidates()] we include SMD values for
 ## four variables and include interactions up to order 3. Because
 ## `suspect_age` is numeric it will not be included in the interactions.
@@ -85,8 +82,7 @@ candidates(
   seeds = 1:20,
   smd_cols = c("suspect_age", "category", "risk_ass", "sus_age_bin"),
   smd_order = 3,
-  downsample = TRUE,
-  replace = FALSE
+  sampling = "downsample"
 )
 
 }

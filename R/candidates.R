@@ -7,8 +7,7 @@
 #' @param seeds A vector of random seeds to be used
 #' @param smd_cols A character vector of columns for which to assess balance. This can be the same as `cov_cols` but it doens't have to be.
 #' @param smd_order An integer denoting the highest order of interaction for which to calculate the standardised mean difference (SMD)
-#' @param replace logical. Passed to [matched_sample()]. Should the comparison cases be sampled with replacement?
-#' @param downsample logical. Passed to [matched_sample()]. Should the treatment cases be downsampled when there aren't enough comparison cases? Only one of `replace` and `downsample` should be TRUE.
+#' @param sampling character. What should happen when there aren't enough comparison cases to cover the treated cases. Should be one of `repeat` (to repeat-sample the comparison cases) and `downsample` (to drop treated cases)
 #' @param drop_int logical. Passed to [matched_sample()]. Should cases in the intervention/treated group be dropped if there are no equivalent cases in the comparison cohort to sample from?
 
 #' @param use_attr logical. Should the attributes of `propscores` (set by [propscores()]) be used to specify `cov_cols`, `arm_col` and `intervention_level`? Default `TRUE`
@@ -42,8 +41,8 @@
 #' ## Now we can use `eg_j_exp300` to find a matched comparison group
 #' ## for each seed in the vector `seeds`. [candidates()] calls
 #' ## [matched_sample()] each time it does this, and we specify that
-#' ## it should downsample the intervention cases (`downsample = TRUE`)
-#' ## rather than sampling from the comparison cases with replacement.
+#' ## it should downsample the intervention cases (`sampling = "downsample"`)
+#' ## rather than repeat-sampling from the comparison cases.
 #' ## In the output of [candidates()] we include SMD values for
 #' ## four variables and include interactions up to order 3. Because
 #' ## `suspect_age` is numeric it will not be included in the interactions.
@@ -54,24 +53,21 @@
 #'   seeds = 1:20,
 #'   smd_cols = c("suspect_age", "category", "risk_ass", "sus_age_bin"),
 #'   smd_order = 3,
-#'   downsample = TRUE,
-#'   replace = FALSE
+#'   sampling = "downsample"
 #' )
 #'
 #' @importFrom rlang .data
 
 
 ## For C-stat, do a min and max case (not sure completely how right now)
-## Do I want some kind of progress bar? I don't think I want to rely on another package
-## but I could use the length of seeds (ie. if it's over 50 then print what percentage done for 10% bands?)
+
 candidates <- function(
   df,
   propscores,
   seeds,
   smd_cols,
   smd_order,
-  replace = TRUE,
-  downsample = FALSE,
+  sampling = "repeat",
   drop_int = FALSE,
   use_attr = TRUE,
   cov_cols = NULL,
@@ -132,8 +128,7 @@ candidates <- function(
       arm_col = arm_col,
       intervention_level = intervention_level,
       seed = seeds[j],
-      replace = replace,
-      downsample = downsample,
+      sampling = sampling,
       drop_int = drop_int
     ) |> suppressMessages()
     df_j <- df_j |> expand_matched_df() |> dplyr::ungroup()

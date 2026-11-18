@@ -35,8 +35,7 @@
 #'   df = eg_data,
 #'   propscores = eg_j_exp300,
 #'   seed = 20,
-#'   replace = TRUE,
-#'   downsample = FALSE,
+#'   sampling = "repeat",
 #'   drop_int = FALSE
 #' )
 #'

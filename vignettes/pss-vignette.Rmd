@@ -165,7 +165,7 @@ The main arguments to `candidates()` are
   - `propscores`: a propensity score data frame (output by `propscores()`)
   - `seeds`: a vector of random seeds
 
-There are also arguments to specify details of diagnostic summaries (`smd_cols`, `smd_order`) and to pass on to `matched_sample()`, which creates the candidate matched sample for each seed (`replace`, `downsample`, `drop_int`). 
+There are also arguments to specify details of diagnostic summaries (`smd_cols`, `smd_order`) and to pass on to `matched_sample()`, which creates the candidate matched sample for each seed (`sampling`, `drop_int`). The defaults for these are `sampling = "repeat"` and `drop_int = FALSE`
 
 ## Examples
 

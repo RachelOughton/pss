@@ -7,8 +7,7 @@
 #' @param df A data frame containing treatment group and comparison cohort data. These should
 #' @param propscores A data frame with a column for each variable in `cov_cols` and a `PropScore` column giving the estimated propensity score for each combination of their levels. This should (usually) have been created by [propscores()] using `df` as input.
 #' @param seed The random seed to be used, for reproducibility
-#' @param replace logical. Should the comparison cases be sampled with replacement?
-#' @param downsample logical. Should the treatment cases be downsampled when there aren't enough comparison cases? Only one of `replace` and `downsample` should be TRUE.
+#' @param sampling character. What should happen when there aren't enough comparison cases to cover the treated cases. Should be one of `repeat` (to repeat-sample the comparison cases) and `downsample` (to drop treated cases)
 #' @param drop_int logical. Should cases in the intervention/treated group be dropped if there are no equivalent cases in the comparison cohort to sample from?
 #' @param use_attr logical. Should the attributes of `propscores` (set by [propscores()]) be used to specify `cov_cols`, `arm_col` and `intervention_level`?
 #' @param cov_cols (only specify if `use_attr == FALSE`) A character vector containing the column names of the covariates to be matched on. These should all be factor / categorical data.
@@ -23,8 +22,8 @@
 #' The data frame can be expanded into a usable data frame (that is, with row `i` included `include[i]` times) using [expand_matched_df()].
 #'
 #' [matched_sample()] will also issue messages indicating:
-#'  - How many comparison cases have been repeated (and how many times) if `replace == TRUE`
-#'   - How many intervention cases have been downsampled, if `downsample == TRUE`
+#'  - How many comparison cases have been repeated (and how many times) if `sampling == "repeat"`
+#'   - How many intervention cases have been downsampled, if `sampling == "downsample"`
 #'   - How many (if any) intervention cases have been dropped because there are no similar comparison cases to sample from, if `drop_int == TRUE`
 #'   - How many (if any) intervention cases have been kept even though there are no similar comparison cases to sample from, if `drop_int == TRUE`
 #'
@@ -49,15 +48,14 @@
 #'
 #' ## Now we can use `eg_j_exp300` to find a matched comparison group
 #' ## In this example we use the attribute information in `propscores`,
-#' ## we sample from the comparison group with replacement
+#' ## we sample from the comparison group with repeatment
 #' ## and do not drop any intervention cases for which there are no
 #' ## comparison cases to sample
-#' match_j_exp300_replace <- matched_sample(
+#' match_j_exp300_repeat <- matched_sample(
 #'   df = eg_data,
 #'   propscores = eg_j_exp300,
 #'   seed = 20,
-#'   replace = TRUE,
-#'   downsample = FALSE,
+#'   sampling = "repeat",
 #'   drop_int = FALSE
 #' )
 #'
@@ -68,8 +66,7 @@ matched_sample <- function(
   df,
   propscores,
   seed,
-  replace = TRUE,
-  downsample = FALSE,
+  sampling = "repeat",
   drop_int = FALSE,
   use_attr = TRUE,
   cov_cols = NULL,
@@ -80,8 +77,8 @@ matched_sample <- function(
 
   Arm <- include <- NULL
   ## Check this is doing what I want!
-  if ((replace & downsample) | !(replace | downsample)) {
-    stop("Exactly one of replace and downsample should be TRUE")
+  if (!(tolower(sampling) %in% c("repeat", "downsample"))) {
+    stop("Sampling should be one of `repeat` or `downsample`")
   }
 
   ## Check use_attr is being used OK
@@ -128,7 +125,7 @@ matched_sample <- function(
   df$include <- 0
 
   df <- dplyr::left_join(df, propscores, by = cov_cols)
-  if (replace) {
+  if (tolower(sampling) == "repeat") {
     for (i in 1:nrow(df)) {
       arm_i <- df[[arm_col]][i]
       prob_samp_i <- as.numeric(df$PropScore[i])
@@ -136,14 +133,11 @@ matched_sample <- function(
       if (arm_i == "Comparison") {
         ran_i <- runif(1)
         if (prob_samp_i > 1) {
-          df$include[i] <- floor(prob_samp_i)
-          prob_remainder_i <- prob_samp_i - floor(prob_samp_i)
-          if (ran_i < prob_remainder_i) {
-            df$include[i] <- df$include[i] + 1
-          }
+          ran_vec_i = runif(n=ceiling(prob_samp_i))
+          new_ps_i = prob_samp_i / ceiling(prob_samp_i)
+          df$include[i] = sum(ran_vec_i <= new_ps_i)
         } else {
           if (ran_i <= prob_samp_i) {
-
             df$include[i] <- 1
           }
           }
@@ -168,7 +162,7 @@ matched_sample <- function(
         )
       }
     }
-  } else if (downsample) {
+  } else if (tolower(sampling) == "downsample") {
     for (i in 1:nrow(df)) {
       arm_i <- df[[arm_col]][i]
       prob_samp_i <- as.numeric(df$PropScore[i])

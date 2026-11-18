@@ -41,8 +41,7 @@ sdf20 = candidates(
   seeds = 1:20,
   smd_cols = c("suspect_age", "category", "risk_ass", "sus_age_bin"),
   smd_order = 3,
-  downsample = TRUE,
-  replace = FALSE
+  sampling = "downsample"
 )
 
 ## Finally we use [plot_smd()] to display the SMD values for each

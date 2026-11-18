@@ -42,38 +42,19 @@ test_that("error1",{
       arm_col = "Arm",
       intervention_level = "Intervention",
       seed = 20,
-      replace = T,
-      downsample = T,
+      sampling = "something",
       drop_int = F
     )
   )
 })
 
-test_that("error2",{
-  expect_error(
-    matched_sample(
-      df = eg_data,
-      propscores = eg_j_est1,
-      cov_cols = c("category", "risk_ass", "sus_age_bin"),
-      arm_col = "Arm",
-      intervention_level = "Intervention",
-      use_attr = FALSE,
-      seed = 20,
-      replace = F,
-      downsample = F,
-      drop_int = F
-    )
-  )
-})
-
-test_that("error3",{
+test_that("error3 - not sure what!",{
   expect_error(
     matched_sample(
       df = eg_data,
       propscores = eg_j_est1,
       seed = 20,
-      replace = F,
-      downsample = F,
+      sampling = "something",
       drop_int = F
     )
   )
@@ -91,8 +72,7 @@ test_that("With replacement, not dropping", {
       use_attr = F,
       intervention_level = "Intervention",
       seed = 20,
-      replace = T,
-      downsample = F,
+      sampling = "repeat",
       drop_int = F
     )
   )})
@@ -108,8 +88,7 @@ test_that("With replacement, not dropping", {
       use_attr = F,
       intervention_level = "Intervention",
       seed = 20,
-      replace = T,
-      downsample = F,
+      sampling = "repeat",
       drop_int = F
     )
   )})
@@ -125,8 +104,7 @@ test_that("downsampling, dropping", {
       intervention_level = "Intervention",
       use_attr = F,
       seed = 20,
-      replace = F,
-      downsample = T,
+      sampling = "downsample",
       drop_int = T
     )
   )})
@@ -134,14 +112,13 @@ test_that("downsampling, dropping", {
 ## Using attributes
 
 
-test_that("With replacement, not dropping", {
+test_that("With replacement, not dropping. Upper case repeat", {
   expect_snapshot(
     matched_sample(
       df = eg_data,
       propscores = eg_mix_exp100,
       seed = 20,
-      replace = T,
-      downsample = F,
+      sampling = "RepEat",
       drop_int = F
     )
   )})
@@ -153,8 +130,7 @@ test_that("With replacement, not dropping", {
       df = eg_data,
       propscores = eg_m_resc15,
       seed = 20,
-      replace = T,
-      downsample = F,
+      sampling = "repeat",
       drop_int = F
     )
   )})
@@ -166,8 +142,7 @@ test_that("downsampling, dropping", {
       df = eg_data,
       propscores = eg_m_resc15,
       seed = 20,
-      replace = F,
-      downsample = T,
+      sampling = "downsample",
       drop_int = T
     )
   )})
@@ -180,8 +155,7 @@ test_that("equal1",{
       df = eg_data,
       propscores = eg_m_resc15,
       seed = 20,
-      replace = F,
-      downsample = T,
+      sampling = "Downsample",
       drop_int = T
     ),
     matched_sample(
@@ -192,8 +166,7 @@ test_that("equal1",{
       cov_cols = c("category", "risk_ass", "sus_age_bin"),
       arm_col = "Arm",
       intervention_level = "Intervention",
-      replace = F,
-      downsample = T,
+      sampling = "downsample",
       drop_int = T
     )
   )
