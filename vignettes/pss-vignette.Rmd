@@ -109,7 +109,7 @@ We will first estimate propensity scores using the fully joint approach and an e
 ```{r}
 ps_joint_exp315 = propscores(
   df = eg_data,
-  cov_cols = c("sus_age_bin", "category", "risk_ass"),
+  cov_cols = c("sus_age_bin", "category", "risk_ass", "nprev_sus_bin"),
   arm_col = "Arm",
   intervention_level = "Intervention",
   cov_dist = "joint",
@@ -121,16 +121,25 @@ Notice that this warns us that there are NA values in two of the columns, leadin
 
 Each of these has columns for every element of `cov_cols`, and columns `px_int`, `px_comp` and `PropScore`. They will also have other columns, depending on which methods were used. 
 
-Below we display the data frame `ps_joint_exp315`. Notice that in one row (`HIGH`, `Theft_CD`, `40+`) the propensity score is `Inf`. This is because there are some such cases in the intervention group, but none in the comparison group, and so although the match sampling process requires some comparison cases, there are none to be sampled. There are also some rows (`MEDIUM`, `Theft / CD`, `Under 29` and `MEDIUM`, `Theft / CD`, `33-39`) for which there are no cases in the intervention cohort, and so no comparison cases will be sampled (and the propensity score is zero).
+Below we display the data frame `ps_joint_exp315`. 
 
 ```{r}
 ps_joint_exp315 |>
-  dplyr::select(c("risk_ass", "category", "sus_age_bin", "px_int", "px_comp", "count_comp", "PropScore")) |>
+  dplyr::select(c("risk_ass", "category", "sus_age_bin", "nprev_sus_bin", "px_int", "px_comp", "count_comp", "PropScore")) |>
 #  dplyr::select(c("risk_ass", "category", "sus_age_bin", "count_int", "count_comp", "PropScore")) |>
   knitr::kable(digits = 3)
 ```
 
-To avoid the arbitrary results of small numbers, but preserve a potential link between `category` and `risk_ass`, we might choose the partially marginal approach instead (for demonstration purposes we also switch to specifying $p(z=1)$ so that the expected size of the comparison group is 250),
+Notice that there are some propensity scores of zero. This indicates that there are no such cases in the treated group, and so none will be sampled from the comparison cohort. There are also some infinite propensity scores. This is more of a problem, as it indicates that there are some such cases in the treated group, but no comparison cases to sample from. We display those below
+
+```{r}
+ps_joint_exp315 |> 
+  dplyr::filter(is.infinite(PropScore)) |>
+  dplyr::select(c("risk_ass", "category", "sus_age_bin", "nprev_sus_bin", "count_int", "PropScore")) |>
+  knitr::kable(digits = 3)
+```
+
+
 
 <!-- ### Mixed approach, expected comparison group size 315 -->
 
@@ -197,10 +206,11 @@ cand1 = candidates(
   propscores = ps_joint_exp315,
   seeds = 251:500,
   sampling = "repeat",
-  smd_cols = c("risk_ass", "category", "sus_age_bin"),
+  smd_cols = c("nprev_sus_bin", "risk_ass", "category", "sus_age_bin"),
   smd_order = 2
 )
 ```
+
 
 View the first 6 rows, rounded to 2 dp. The columns `n_int` and `n_comp` show how many cases are in the matched intervention and comparison groups for each seed.
 
@@ -208,11 +218,122 @@ View the first 6 rows, rounded to 2 dp. The columns `n_int` and `n_comp` show ho
 cand1[1:6,] |> knitr::kable(digits = 2)
 ```
 
-The SMD values for each seed can be visualised using `plot_smd()`. Using the optional input `smd_thresh` we highlight those seeds for which all SMD values are below 0.1. For this example there is only one such seed: `153`, and so we will continue with this as our final matched dataset.
+We can check here that the matched comparison groups have around 315 cases
+
+```{r}
+summary(cand1$n_comp)
+```
+
+
+
+The SMD values for each seed can be visualised using `plot_smd()`, though we see that none have all SMD values under 0.1.
 
 ```{r}
 plot_smd(cand1, smd_thresh=0.1)
 ```
+
+Because there are several propensity scores over 10, each for a single comparison case, it may be better to downsample treated cases rather than repeat-sample these comparison cases. This will result in the matched comparison group being smaller, and in some treated cases being dropped from the matched dataset. We also set `drop_int = TRUE`, so that any treated case with no matching comparison cases to sample from is dropped.
+
+```{r}
+cand2 = candidates(
+  df = eg_data,
+  propscores = ps_joint_exp315,
+  seeds = 251:500,
+  sampling = "downsample",
+  drop_int = T,
+  smd_cols = c("nprev_sus_bin", "risk_ass", "category", "sus_age_bin"),
+  smd_order = 2
+)
+```
+
+View the first 6 rows, rounded to 2 dp:
+
+```{r}
+cand2[1:6,] |> knitr::kable(digits = 2)
+```
+
+Plot the SMD values: 
+
+```{r}
+plot_smd(cand2, smd_thresh=0.1)
+```
+
+We do now have a seed leading to all SMD values under 0.1, but we also see that the matched comparison groups are considerably smaller
+
+```{r}
+summary(cand2$n_comp)
+```
+
+and many cases are being dropped from the treated group
+
+```{r}
+summary(cand2$n_int)
+```
+
+### Mixed estimation approach
+
+We might want to try using the joint density for `nprev_sus_bin`, `category` and `risk_ass` (which might reasonably be considered to be related), and considering `sus_age_bin` separately. This could have the advantage of reducing the number of infinite propensity scores compared to the fully joint model. We can do this using the `cov_dist` argument to `propscores()`. 
+
+```{r}
+ps_mixed_exp315 = propscores(
+  df = eg_data,
+  cov_cols = c("sus_age_bin", "category", "risk_ass", "nprev_sus_bin"),
+  arm_col = "Arm",
+  intervention_level = "Intervention",
+  cov_dist = list(c("nprev_sus_bin", "category", "risk_ass")),
+  pz1_fn = pz1_expectedN(315)
+)
+```
+
+We can display this as before
+
+```{r}
+ps_mixed_exp315 |>
+  dplyr::select(c("risk_ass", "category", "sus_age_bin", "nprev_sus_bin", "px_int", "px_comp", "count_comp", "PropScore")) |>
+#  dplyr::select(c("risk_ass", "category", "sus_age_bin", "count_int", "count_comp", "PropScore")) |>
+  knitr::kable(digits = 3)
+```
+
+and filter to the subset of infinite propensity scores. This shows a great improvement compared to the fully joint approach.
+
+```{r}
+ps_mixed_exp315 |> 
+  dplyr::filter(is.infinite(PropScore)) |>
+  dplyr::select(c("risk_ass", "category", "sus_age_bin", "nprev_sus_bin", "count_int", "PropScore")) |>
+  knitr::kable(digits = 3)
+```
+
+Keeping the sampling choices as for `cand2` (downsampling treated cases and dropping those with no matching comparison cases) we can generate a new set of candidates
+
+```{r}
+cand3 = candidates(
+  df = eg_data,
+  propscores = ps_mixed_exp315,
+  seeds = 1:500,
+  sampling = "downsample",
+  drop_int = T,
+  smd_cols = c("nprev_sus_bin", "risk_ass", "category", "sus_age_bin"),
+  smd_order = 2
+)
+```
+
+and plot as before
+
+```{r}
+plot_smd(cand3, smd_thresh = 0.1)
+```
+
+Most SMD values are good, but for the interactions between `sus_age_bin` and `category`, and `sus_age_bin` and `nprev_sus_bin` there are no SMD values under around 0.2. 
+
+The sizes of the candidate matched datasets are slightly increased compared to `cand2`:
+
+```{r}
+summary(cand3$n_int)
+summary(cand3$n_comp)
+```
+
+
+
 
 <!-- ### Mixed approach, expected comparison group size 315 -->
 

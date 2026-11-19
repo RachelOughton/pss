@@ -274,6 +274,7 @@ propscores <- function(
       )
     )
 
+  df_out$ratio[df_out$count_int ==0] = 0 # safeguard against n_int and n_comp both being zero, leading to NaN
   return(df_out)
 }
 
@@ -318,6 +319,7 @@ pz1_rescale <- function(
     pz1 <- n_pz1 / max_ratio
     return(pz1)
   }
+  message(sprintf("p(z=1) has been set to %g", pz1))
   return(pz1_fn)
 }
 
@@ -340,6 +342,8 @@ pz1_expectedN <- function(
     sum_comp <- sum(nj_rat, na.rm=T)
 
     pz1 <- n_pz1 / sum_comp
+    message(sprintf("p(z=1) has been set to %g", pz1))
+
     return(pz1)
   }
   return(pz1_fn)
