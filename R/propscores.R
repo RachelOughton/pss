@@ -117,6 +117,8 @@ propscores <- function(
 
   pz1_fun <- pz1_fn
   pz1 <- pz1_fun(df_out)
+  message(sprintf("p(z=1) has been set to %g", pz1))
+
   df_out$PropScore <- pz1 * df_out$ratio
   attributes(df_out) <- c(
     attributes(df_out),
@@ -319,7 +321,6 @@ pz1_rescale <- function(
     pz1 <- n_pz1 / max_ratio
     return(pz1)
   }
-  message(sprintf("p(z=1) has been set to %g", pz1))
   return(pz1_fn)
 }
 
@@ -342,7 +343,6 @@ pz1_expectedN <- function(
     sum_comp <- sum(nj_rat, na.rm=T)
 
     pz1 <- n_pz1 / sum_comp
-    message(sprintf("p(z=1) has been set to %g", pz1))
 
     return(pz1)
   }
