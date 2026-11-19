@@ -314,7 +314,7 @@ pz1_rescale <- function(
       stop(sprintf("n_pz1 should be positive but you have entered %g", pz1))
 
     df_finite <- df |> dplyr::filter(!is.infinite(.data$ratio))
-    max_ratio <- max(df_finite$ratio)
+    max_ratio <- max(df_finite$ratio, na.rm=T)
     pz1 <- n_pz1 / max_ratio
     return(pz1)
   }
@@ -337,7 +337,7 @@ pz1_expectedN <- function(
     ## should already have count_comp for every combination
     df_noninf <- df |> dplyr::filter(!is.infinite(.data$ratio))
     nj_rat <- df_noninf$count_comp * df_noninf$ratio
-    sum_comp <- sum(nj_rat)
+    sum_comp <- sum(nj_rat, na.rm=T)
 
     pz1 <- n_pz1 / sum_comp
     return(pz1)
