@@ -2,7 +2,7 @@
 % Please edit documentation in R/plot_smd.R
 \name{plot_smd}
 \alias{plot_smd}
-\title{Plots standardised mean difference (SMD) for each covariate and interaction in a \code{\link[=candidates]{candidates()}} data frame. If a threshold value for the SMD is given (via \code{smd_thresh}) then the output for those seeds with any SMD value exceeding the threshold are greyed, and a message is generated listing the successful seeds.}
+\title{Plots of SMD summaries}
 \usage{
 plot_smd(summary_df, smd_thresh = NULL)
 }
@@ -15,7 +15,7 @@ plot_smd(summary_df, smd_thresh = NULL)
 A plot with covariates and covariate interactions on the x axis and SMD on the y axis. Lines connect SMD values for the same seed.
 }
 \description{
-Plots standardised mean difference (SMD) for each covariate and interaction in a \code{\link[=candidates]{candidates()}} data frame. If a threshold value for the SMD is given (via \code{smd_thresh}) then the output for those seeds with any SMD value exceeding the threshold are greyed, and a message is generated listing the successful seeds.
+Plots standardised mean difference (SMD) for each covariate and interaction in a \code{\link[=candidates]{candidates()}} data frame. If a threshold value for the SMD is given (via \code{smd_thresh}) then the output for those seeds with any SMD value exceeding the threshold are greyed, and a message is generated listing the successful seeds (those with no SMD values above \code{smd_thresh}).
 }
 \examples{
 ## First use `propscores` to create a propensity score data frame

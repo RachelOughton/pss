@@ -55,3 +55,15 @@ candidates(
   smd_cols = c("risk_ass", "category", "sus_age_bin"),
   smd_order = 2
 )
+
+## Including a continuous cov
+
+candidates(
+  df = eg_data,
+  propscores = eg_j_est015,
+  seeds = 3*(1:10),
+  smd_cols = c("risk_ass", "category", "suspect_age"),
+  smd_order = 2
+)
+
+

@@ -25,9 +25,9 @@ candidates(
 
 \item{seeds}{A vector of random seeds to be used}
 
-\item{smd_cols}{A character vector of columns for which to assess balance. This can be the same as \code{cov_cols} but it doens't have to be.}
+\item{smd_cols}{A character vector of columns for which to assess balance. This can be the same as \code{cov_cols} but it doesn't have to be}
 
-\item{smd_order}{An integer denoting the highest order of interaction for which to calculate the standardised mean difference (SMD)}
+\item{smd_order}{An integer denoting the highest order of interaction for which to calculate the standardised mean difference (SMD) for categorical covariates}
 
 \item{sampling}{character. What should happen when there aren't enough comparison cases to cover the treated cases. Should be one of \code{repeat} (to repeat-sample the comparison cases) and \code{downsample} (to drop treated cases)}
 
@@ -48,6 +48,7 @@ candidates(
 \item \code{n_int}: the number of treated / intervention cases included in the matched sample for that seed
 \item \code{n_comp}: the number of comparison cases included in the matched sample for that seed
 \item \code{SMD_...}: column for each covariate and covariate interaction, giving the calculated SMD, found using \code{\link[smd:smd]{smd::smd()}}
+\item \code{max_SMD}: the row-wise maximum SMD value
 }
 }
 \description{

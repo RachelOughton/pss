@@ -36,10 +36,10 @@ library(pss)
 
 The suggested workflow is as follows:
 
-  1. Prepare data. Any continuous variable to be used in matching should be binned into an ordinal variable.
-  2. Estimate propensity scores using `propscores()`
-  3. Generate and investigate a set of candidate matched samples using `candidates()` and `plot_smd()` and select the best `seed`.
-  4. Generate the final matched dataset using `matched_sample()`, by fixing `seed` to the value chosen above. The dataset can be further investigated using `dropped_cases()`, and formatted for analysis by `expand_matched_df()`.
+  1. **Prepare data**. Any continuous variable to be used in matching should be binned into an ordinal variable.
+  2. **Estimate propensity scores** using `propscores()`
+  3. **Generate and investigate a set of candidate matched samples** using `candidates()` and `plot_smd()` and select the best `seed`.
+  4. **Generate the final matched dataset** using `matched_sample()`, by fixing `seed` to the value chosen above. The dataset can be further investigated using `dropped_cases()`, and formatted for analysis by `expand_matched_df()`.
 
 
 # Estimating propensity scores (`propscores()`)
@@ -104,7 +104,131 @@ eg_data$nprev_sus_bin = factor(eg_data$nprev_sus_bin, levels = c("zero", "one", 
 
 ### Joint approach, expected comparison group size 315
 
-We will first estimate propensity scores using the fully joint approach and an estimate of $\tilde{p}(Z=1)$ to achieve an expected comparison group size of 315 (the same size as the treated group):
+We will first estimate propensity scores using the fully joint approach. In this example we balance on only two covariates (`risk_ass` and `nprev_sus_bin`), to keep things simple. A more complex example is given below, with different options chosen. Here we specify $p(Z=1)=0.3$ by setting `pz1_fn = pz1_estimate(0.3)`.
+
+```{r}
+ps_joint_est03 = propscores(
+  df = eg_data,
+  cov_cols = c("risk_ass", "nprev_sus_bin"),
+  arm_col = "Arm",
+  intervention_level = "Intervention",
+  cov_dist = "joint",
+  pz1_fn = pz1_estimate(0.3)
+)
+```
+
+```{r, echo=F}
+ps_joint_est03 |> 
+  dplyr::select(c("risk_ass", "nprev_sus_bin", "count_comp", "count_int", "ratio", 
+ "PropScore")) |>
+  knitr::kable(digits = 3)
+```
+
+We could alternatively use the marginal estimation method
+
+
+```{r}
+ps_marg_est03 = propscores(
+  df = eg_data,
+  cov_cols = c("risk_ass", "nprev_sus_bin"),
+  arm_col = "Arm",
+  intervention_level = "Intervention",
+  cov_dist = "marginal",
+  pz1_fn = pz1_estimate(0.3)
+)
+```
+
+```{r, echo=F}
+ps_marg_est03 |> 
+  dplyr::select(c("risk_ass", "nprev_sus_bin", "count_comp", "count_int", "ratio", 
+ "PropScore")) |>
+  knitr::kable(digits = 3)
+```
+
+
+Each of these has columns for every element of `cov_cols`, and columns `count_int`, `count_comp` and `PropScore`. They will also have other columns, depending on which methods were used. 
+
+# Generating a collection of candidate matched samples (`candidates()`)
+
+Because propensity score sampling uses random sampling, we can generate many candidate matched samples and choose the best. The study outcome variable must not be involved in this process (even if we have the data).
+
+The main arguments to `candidates()` are
+
+  - `df`: a data frame of study data
+  - `propscores`: a propensity score data frame (output by `propscores()`, or of the same format)
+  - `seeds`: a vector of random seeds
+  - `smd_cols`: a vector of covariates for which SMD should be calculated. This can include covariates not in `cov_cols`
+  - `smd_order`: the order of interactions for SMD
+  - `sampling`, `drop_int`: arguments that are passed on to `matched_sample()`. The defaults for these are `sampling = "repeat"` and `drop_int = FALSE`.
+  
+We can generate candidates using `ps_joint_est03`, repeat-sampling comparison cases where necessary (we see that two propensity scores are greater than one)
+
+```{r, cache=T}
+cand_simp1 = candidates(
+  df = eg_data,
+  propscores = ps_joint_est03,
+  seeds = 1:100,
+  smd_cols = c("risk_ass", "nprev_sus_bin"),
+  smd_order = 2,
+  sampling = "repeat"
+)
+```
+
+Using `plot_smd()` we can see which seeds (if any) satisfy our criterion that SMD be below 0.1
+
+```{r, fig.width=6, fig.height=4}
+plot_smd(cand_simp1, smd_thresh = 0.1)
+```
+
+There are various ways we could choose a final dataset from this point. We could choose the matched sample with the greatest number of comparison cases
+
+```{r}
+cand_simp1 |>
+  dplyr::filter(max_SMD <= 0.1) |>
+  dplyr::filter(n_comp == max(n_comp)) |>
+  knitr::kable(digits = 3)
+```
+
+Of the two options, `seed = 97` has the smaller maximum SMD value, so this would be the natural choice. 
+
+Alternatively, we could choose the seed whose dataset has the smallest maximum SMD, leading to `seed = 85`.
+
+```{r}
+cand_simp1 |>
+  dplyr::filter(max_SMD == min(max_SMD)) |>
+  knitr:: kable(digits = 3)
+```
+For this example we will choose `seed = 97`. We can now create that matched sample using `matched_sample()`. Because we are otherwise using the default options we don't need to specify `sampling`, `drop_int`, `use_attr` etc.
+
+```{r}
+matched_df_97 = matched_sample(
+  df = eg_data,
+  propscores = ps_joint_est03,
+  seed = 97
+)
+```
+
+The dataset `matched_df_97`, created by `matched_sample()` is not in a format suitable for analysis, but in a format that enables us to investigate how any repeat-sampling (or downsampling). 
+
+We can see more detail about the repeat-sampled cases using `repeat_cases()`
+
+```{r}
+repeat_cases(matched_df_97)
+```
+
+To create a data frame ready for analysis, we use `expand_matched_df()`, which includes each row of `matched_df_97` `matched_df_97$include` times. 
+
+```{r}
+exp_matched_df_97 = expand_matched_df(matched_df_97)
+```
+
+This shows us that two types of comparison case are being repeat sampled. Since there are 9 and 11 such cases, we might decide that this is acceptable. 
+
+## Examples
+
+
+
+# A more complex example
 
 ```{r}
 ps_joint_exp315 = propscores(
@@ -117,18 +241,16 @@ ps_joint_exp315 = propscores(
 )
 ```
 
-Notice that this warns us that there are NA values in two of the columns, leading to rows being lost. 
-
-Each of these has columns for every element of `cov_cols`, and columns `px_int`, `px_comp` and `PropScore`. They will also have other columns, depending on which methods were used. 
 
 Below we display the data frame `ps_joint_exp315`. 
 
 ```{r}
 ps_joint_exp315 |>
-  dplyr::select(c("risk_ass", "category", "sus_age_bin", "nprev_sus_bin", "px_int", "px_comp", "count_comp", "PropScore")) |>
+  dplyr::select(c("risk_ass", "category", "sus_age_bin", "nprev_sus_bin", "count_int", "count_comp", "PropScore")) |>
 #  dplyr::select(c("risk_ass", "category", "sus_age_bin", "count_int", "count_comp", "PropScore")) |>
-  knitr::kable(digits = 3)
+  knitr::kable(digits = 3) 
 ```
+
 
 Notice that there are some propensity scores of zero. This indicates that there are no such cases in the treated group, and so none will be sampled from the comparison cohort. There are also some infinite propensity scores. This is more of a problem, as it indicates that there are some such cases in the treated group, but no comparison cases to sample from. We display those below
 
@@ -139,58 +261,6 @@ ps_joint_exp315 |>
   knitr::kable(digits = 3)
 ```
 
-
-
-<!-- ### Mixed approach, expected comparison group size 315 -->
-
-<!-- ```{r} -->
-<!-- ps_mix_exp315 = propscores( -->
-<!--   df = eg_data, -->
-<!--   cov_cols = c("sus_age_bin", "category", "risk_ass"), -->
-<!--   arm_col = "Arm", -->
-<!--   intervention_level = "Intervention", -->
-<!--   cov_dist = list(c("risk_ass", "category")), -->
-<!--   pz1_fn = pz1_expectedN(315) -->
-<!-- ) -->
-<!-- ``` -->
-
-<!-- This has no infinite propensity scores -->
-
-<!-- ```{r} -->
-<!-- ps_mix_exp315 |> -->
-<!--   dplyr::select(c("risk_ass", "category", "sus_age_bin", "px_int", "px_comp", "PropScore")) |> -->
-<!--   #  dplyr::select(c("risk_ass", "category", "sus_age_bin", "count_int", "count_comp", "PropScore")) |> -->
-<!--   knitr::kable(digits = 3) -->
-<!-- ``` -->
-
-<!-- An alternative would be to adopt the fully marginal approach (changing the method for $p(Z=1)$ again for demonstration purposes, now fixing $p(Z=1)$ so that the largest propensity score is 2) -->
-
-
-<!-- ```{r} -->
-<!-- ps_marg_resc2 = propscores( -->
-<!--   df = eg_data, -->
-<!--   cov_cols = c("risk_ass", "category", "sus_age_bin", "nprev_sus_bin"), -->
-<!--   arm_col = "Arm", -->
-<!--   intervention_level = "Intervention", -->
-<!--   cov_dist = "marginal", -->
-<!--   pz1_fn = pz1_rescale(2) -->
-<!-- ) -->
-<!-- ``` -->
-
-# Generating a collection of candidate matched samples (`candidates()`)
-
-Because propensity score sampling uses random sampling, we can generate many candidate matched samples and choose the best. The study outcome variable must not be involved in this process (even if we have the data) because that would lead to bias.
-
-The main arguments to `candidates()` are
-
-  - `df`: a data frame of study data
-  - `propscores`: a propensity score data frame (output by `propscores()`, or of the same format)
-  - `seeds`: a vector of random seeds
-
-There are also arguments to specify details of diagnostic summaries (`smd_cols`, `smd_order`) and to pass on to `matched_sample()`, which creates the candidate matched sample for each seed (`sampling`, `drop_int`). The defaults for these are `sampling = "repeat"` and `drop_int = FALSE`
-
-## Examples
-
 ### Joint approach, expected comparison group size 315
 
 Here we make the following choices: 
@@ -200,7 +270,7 @@ Here we make the following choices:
   - seeds `1:250`
   - Calculating the SMD for the covariates in `smd_cols` and their second order interactions (set by `smd_order = 2`)
 
-```{r}
+```{r, cache=T}
 cand1 = candidates(
   df = eg_data,
   propscores = ps_joint_exp315,
@@ -228,13 +298,13 @@ summary(cand1$n_comp)
 
 The SMD values for each seed can be visualised using `plot_smd()`, though we see that none have all SMD values under 0.1.
 
-```{r}
+```{r, fig.width=6, fig.height=4}
 plot_smd(cand1, smd_thresh=0.1)
 ```
 
 Because there are several propensity scores over 10, each for a single comparison case, it may be better to downsample treated cases rather than repeat-sample these comparison cases. This will result in the matched comparison group being smaller, and in some treated cases being dropped from the matched dataset. We also set `drop_int = TRUE`, so that any treated case with no matching comparison cases to sample from is dropped.
 
-```{r}
+```{r, cache=T}
 cand2 = candidates(
   df = eg_data,
   propscores = ps_joint_exp315,
@@ -249,12 +319,12 @@ cand2 = candidates(
 View the first 6 rows, rounded to 2 dp:
 
 ```{r}
-cand2[1:6,] |> knitr::kable(digits = 2)
+cand2[1:6,] |> knitr::kable(digits = 2) 
 ```
 
 Plot the SMD values: 
 
-```{r}
+```{r, fig.width=6, fig.height=4}
 plot_smd(cand2, smd_thresh=0.1)
 ```
 
@@ -305,7 +375,7 @@ ps_mixed_exp315 |>
 
 Keeping the sampling choices as for `cand2` (downsampling treated cases and dropping those with no matching comparison cases) we can generate a new set of candidates
 
-```{r}
+```{r, cache=T}
 cand3 = candidates(
   df = eg_data,
   propscores = ps_mixed_exp315,
@@ -319,7 +389,7 @@ cand3 = candidates(
 
 and plot as before
 
-```{r}
+```{r, fig.width=6, fig.height=4}
 plot_smd(cand3, smd_thresh = 0.1)
 ```
 
@@ -331,9 +401,6 @@ The sizes of the candidate matched datasets are slightly increased compared to `
 summary(cand3$n_int)
 summary(cand3$n_comp)
 ```
-
-
-
 
 <!-- ### Mixed approach, expected comparison group size 315 -->
 
@@ -375,4 +442,44 @@ summary(cand3$n_comp)
 
 # Creating the final matched sample (`matched_sample`)
 
+Having investigated candidate matched samples using a variety of approaches we will continue with the one candidate that satisfied our SMD threshold: 
+
+   - joint estimation approach
+   - $p(Z=1)$ fixed by setting $N^{\text{exp}}_{\text{comp}} = 315$
+   - downsampling treated cases 
+   - dropping unmatched treated cases
+   
+Our propensity score object is therefore `ps_joint_exp315` and we set `seed = 421`. 
+
+We create this dataset by
+
+```{r}
+matched_sample_final = matched_sample(
+  df= eg_data,
+  propscores= ps_joint_exp315,
+  seed = 421,
+  sampling = "downsample",
+  drop_int = T
+)
+```
+
+`matched_sample_final` contains the same rows as `eg_data` and a column `include`, which indicates how many times each row is to be included. Since we have selected `sampling = "downsample"` the `include` values will all be 0 or 1. If we had set `sampling = "repeat"` then some comparison cases would have `include`>1.
+
+We can summarise the dropped treated cases using `dropped_cases()`
+
+```{r}
+dropped_cases(matched_sample_final)
+```
+
+If we had set `sampling = "treated"` then we would use `repeat_cases()` to view the repeated comparison cases. 
+
+We can expand the dataset to include each row `include` times using `expand_matched_df()`
+
+```{r}
+exp_ms_fianl = expand_matched_df(matched_sample_final)
+```
+
+This is the data frame we would use in the subsequent study analysis.
+
+# References
 

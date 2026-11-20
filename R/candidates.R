@@ -5,8 +5,8 @@
 #' @param df A data frame from which to generate matched samples
 #' @param propscores A data frame (created by [propscores()], or with the same format) giving a propensity score (in column `PropScore`) for every covariate being matched on
 #' @param seeds A vector of random seeds to be used
-#' @param smd_cols A character vector of columns for which to assess balance. This can be the same as `cov_cols` but it doens't have to be.
-#' @param smd_order An integer denoting the highest order of interaction for which to calculate the standardised mean difference (SMD)
+#' @param smd_cols A character vector of columns for which to assess balance. This can be the same as `cov_cols` but it doesn't have to be
+#' @param smd_order An integer denoting the highest order of interaction for which to calculate the standardised mean difference (SMD) for categorical covariates
 #' @param sampling character. What should happen when there aren't enough comparison cases to cover the treated cases. Should be one of `repeat` (to repeat-sample the comparison cases) and `downsample` (to drop treated cases)
 #' @param drop_int logical. Passed to [matched_sample()]. Should cases in the intervention/treated group be dropped if there are no equivalent cases in the comparison cohort to sample from?
 
@@ -20,6 +20,7 @@
 #' - `n_int`: the number of treated / intervention cases included in the matched sample for that seed
 #' - `n_comp`: the number of comparison cases included in the matched sample for that seed
 #' - `SMD_...`: column for each covariate and covariate interaction, giving the calculated SMD, found using [smd::smd()]
+#' - `max_SMD`: the row-wise maximum SMD value
 
 #' @export
 #' @seealso [matched_sample()], [expand_matched_df()]
@@ -191,5 +192,9 @@ candidates <- function(
       order <- order + 1
     }
   }
+  df_out = df_out |>
+    dplyr::rowwise() |>
+    dplyr::mutate(max_SMD = max(dplyr::c_across(tidyselect::starts_with("SMD")), na.rm = TRUE)) |>
+    dplyr::ungroup()
   return(df_out)
 }
