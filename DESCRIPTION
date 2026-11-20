@@ -17,6 +17,7 @@ Imports:
     ggplot2,
     rlang,
     smd,
+    stats,
     tidyr,
     tidyselect
 Suggests: 

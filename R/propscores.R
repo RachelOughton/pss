@@ -276,7 +276,7 @@ propscores <- function(
       )
     )
 
-  df_out$ratio[df_out$count_int ==0] = 0 # safeguard against n_int and n_comp both being zero, leading to NaN
+#  df_out$ratio[df_out$count_int ==0] = 0 # No! This leads to marginal approach being overwritten!
   return(df_out)
 }
 

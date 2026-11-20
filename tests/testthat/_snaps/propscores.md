@@ -169,6 +169,7 @@
     Message
       There are 1 NA values in the category column. These rows will be lost.
       There are 1 NA values in the sus_age_bin column. These rows will be lost.
+      p(z=1) has been set to 0.432895
     Output
          risk_ass          category sus_age_bin p_int_risk_ass.category
       1    MEDIUM Course of conduct    Under 29             0.232484076
@@ -257,6 +258,7 @@
       There are 1 NA values in the category column. These rows will be lost.
       Column category has been coerced to a factor with 3 levels
       There are 1 NA values in the sus_age_bin column. These rows will be lost.
+      p(z=1) has been set to 0.363958
     Output
          risk_ass          category sus_age_bin p_int_risk_ass.category.sus_age_bin
       1      HIGH Course of conduct    Under 29                         0.111464968
@@ -345,6 +347,7 @@
       There are 1 NA values in the category column. These rows will be lost.
       Column category has been coerced to a factor with 3 levels
       There are 1 NA values in the sus_age_bin column. These rows will be lost.
+      p(z=1) has been set to 0.01
     Output
          risk_ass          category sus_age_bin p_int_risk_ass p_comp_risk_ass
       1      HIGH Course of conduct    Under 29      0.7038217       0.3147877
@@ -433,6 +436,7 @@
       There are 1 NA values in the category column. These rows will be lost.
       Column category has been coerced to a factor with 3 levels
       There are 1 NA values in the sus_age_bin column. These rows will be lost.
+      p(z=1) has been set to 0.432895
     Output
          risk_ass          category sus_age_bin p_int_risk_ass.category
       1      HIGH Course of conduct    Under 29             0.378980892

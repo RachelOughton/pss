@@ -48,7 +48,7 @@ match_j_exp300_replace <- matched_sample(
   df = eg_data,
   propscores = eg_j_exp300,
   seed = 20,
-  sampling = "repeat",
+  sampling = "downsample",
   drop_int = FALSE
 )
 
@@ -60,5 +60,5 @@ match_j_exp300_replace |> dropped_cases()
 
 }
 \seealso{
-\code{\link[=matched_sample]{matched_sample()}}
+\code{\link[=matched_sample]{matched_sample()}}, \code{\link[=repeat_cases]{repeat_cases()}}
 }

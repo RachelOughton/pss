@@ -10,7 +10,7 @@
 #' - `n_kept`: how many treated / intervention cases with this combination of `cov_cols` have been kept
 #' The rows will be ordered in descending order of `n_dropped`
 #' @export
-#' @seealso [matched_sample()]
+#' @seealso [matched_sample()], [repeat_cases()]
 #'
 #' @examples
 #' ## First use [propscores()] to create a propensity score data frame
@@ -35,7 +35,7 @@
 #'   df = eg_data,
 #'   propscores = eg_j_exp300,
 #'   seed = 20,
-#'   sampling = "repeat",
+#'   sampling = "downsample",
 #'   drop_int = FALSE
 #' )
 #'
@@ -64,7 +64,7 @@ dropped_cases <- function(
     }
   }
   if(any(matched_df$include > 1))
-      warning("Some cases are being repeat-sampled in this matched data frame. The number kept will reflect this.")
+      warning("Some comparison cases are being repeat-sampled in this matched data frame. You can see details of the repeat-sampled cases using `repeat_cases()`")
   df_int <- matched_df |>
     dplyr::filter(Arm == "Intervention") |>
     dplyr::group_by(dplyr::pick(tidyselect::all_of(cov_cols))) |>
