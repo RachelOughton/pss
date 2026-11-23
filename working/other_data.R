@@ -45,3 +45,24 @@ ps_spm = propscores(
 )
 
 ps_spm
+
+
+# scidesignR smoking data
+
+library(scidesignR)
+glimpse(nhefs9282)
+
+nhef = nhefs9282
+nhef$wt82_bin = "Under 145"
+nhef$wt82_bin[nhef$wt1982 > 145] = "145 to 175"
+nhef$wt82_bin[nhef$wt1992 > 175] = "Over 175"
+nhef$wt82_bin = as.factor(nhef$wt82_bin)
+
+ps_nhef_j = propscores(
+  df = nhef,
+  cov_cols = c("wt82_bin", "sex", "genhealth1982", "hyperhb1982", "cancer1982", "cough1982"),
+  arm_col = "smoke1982",
+  intervention_level = 1,
+  cov_dist = "joint",
+  pz1_fn = pz1_estimate(0.3)
+)

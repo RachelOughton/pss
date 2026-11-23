@@ -24,7 +24,7 @@ The function does the following:
 \itemize{
 \item checks the \code{arm_col} column has two unique values, one of which is \code{intervention_level}
 \item adds an \code{Arm} column, with two levels ("Intervention" and "Comparison")
-\item checks the columns named in \code{cov_cols} are present and in a suitable form (ideally factor, but if character it will coerce to factor and give a warning)
+\item checks the columns named in \code{cov_cols} are present and in a suitable form (ideally factor, but if character it will coerce to factor and give a message, and if numeric with fewer than 10 distinct values it will coerce to factor and give a message)
 \item Removes rows for which any of \code{cov_cols} or \code{arm_col} is missing.
 }
 }

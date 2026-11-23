@@ -4,12 +4,12 @@
 #' The function does the following:
 #' - checks the `arm_col` column has two unique values, one of which is `intervention_level`
 #' - adds an `Arm` column, with two levels ("Intervention" and "Comparison")
-#' - checks the columns named in `cov_cols` are present and in a suitable form (ideally factor, but if character it will coerce to factor and give a warning)
+#' - checks the columns named in `cov_cols` are present and in a suitable form (ideally factor, but if character it will coerce to factor and give a message, and if numeric with fewer than 10 distinct values it will coerce to factor and give a message)
 #' - Removes rows for which any of `cov_cols` or `arm_col` is missing.
 #'
 #' @name pss_check_data
 #' @param df A data frame containing treatment group and comparison cohort data
-#' @param cov_cols A character vector containing the column names of the covariates to be matched on. These should all be factor / categorical data.
+#' @param cov_cols A character vector containing the column names of the covariates to be matched on. These should all be factor / categorical data, or numerical with fewer than 10 distinct values.
 #' @param arm_col The name of the column indicating which rows are treated cases and which are comparison cases. These should be factor or character, with only two levels / options.
 #' @param intervention_level The value in the `arm_col` for the treatment cases
 #' @return `pss_check_data` returns a (possibly slightly tidied up) data frame or an error message. The data frame will have an `Arm` column with levels `Intervention` and `Comparison`.
@@ -111,6 +111,23 @@ pss_check_data <- function(
           )
         )
         df[[col_i]] = col_i_fac
+      } else if (is.numeric(col_i_vec)){
+        if(length(unique(col_i_vec)) < 10){
+          df[[col_i]] = as.factor(col_i_vec)
+          message(
+            sprintf(
+              "Column %s has been coerced to a factor with %g levels",
+              col_i, length(unique(col_i_vec))
+            )
+          )
+        } else {
+          stop(
+            sprintf(
+              "Covariate %s is numeric and takes %g distinct so should be binned into a factor variable",
+              col_i, length(unique(col_i_vec))
+            )
+          )
+        }
       } else {
         stop(
           sprintf(
