@@ -31,6 +31,19 @@ eg_mix_exp100 = propscores(
   pz1_fn = pz1_expectedN(100)
 )
 
+## With nprev sus bin
+
+
+eg_j_np_est1 = propscores(
+  df = eg_data,
+  cov_cols = c("risk_ass", "category", "nprev_sus_bin", "sus_age_bin"),
+  arm_col = "Arm",
+  intervention_level = "Intervention",
+  cov_dist = "joint",
+  pz1_fn = pz1_estimate(1)
+)
+
+
 ## Checking mixed covdist function - need to do some that make errors, and
 ## some with more combinations of variables (and higher orders of combinations)
 

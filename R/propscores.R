@@ -247,6 +247,8 @@ propscores <- function(
 
   ## Find ratio
   df_out$ratio <- df_out$px_int / df_out$px_comp
+  #trying to solve NaN issues in joint approach- needs to be row-wise!
+  df_out$ratio[(df_out$px_int==0)&(df_out$px_comp==0)] = 0
 
   ## Find count_comp, which we will need later
   df_comp <- df |> dplyr::filter(Arm == "Comparison")
