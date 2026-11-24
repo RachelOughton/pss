@@ -2,7 +2,7 @@
 % Please edit documentation in R/repeat_cases.R
 \name{repeat_cases}
 \alias{repeat_cases}
-\title{Display the treatment cases that will be dropped under a particular matched sample}
+\title{Display the comparison cases that will be repeated for a particular matched sample}
 \usage{
 repeat_cases(matched_df, use_attr = TRUE, cov_cols = NULL)
 }
@@ -23,7 +23,7 @@ repeat_cases(matched_df, use_attr = TRUE, cov_cols = NULL)
 }
 }
 \description{
-Display the treatment cases that will be dropped under a particular matched sample
+Display the comparison cases that will be repeated for a particular matched sample
 }
 \examples{
 ## First use [propscores()] to create a propensity score data frame

@@ -1,4 +1,4 @@
-#' Display the treatment cases that will be dropped under a particular matched sample
+#' Display the comparison cases that will be repeated for a particular matched sample
 #'
 #' @name repeat_cases
 #' @param matched_df A data frame output by [matched_sample()]. This should contain columns for `arm_col`, all elements of `cov_cols` and `include`. It must have the `Arm` column with levels `"Intervention"` and `"Comparison"`. It may also contain other columns.
