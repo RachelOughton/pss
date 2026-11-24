@@ -29,7 +29,7 @@ pz1_expectedN(n_pz1)
 
 \item{cov_dist}{Either "joint" for fully joint distribution, "marginal" for fully marginal distribution, or a list of of character vectors indicating groups of covariates that should be considered jointly.}
 
-\item{pz1_fn}{One of the functions used to specify p(Z=1): \code{pz1_rescale()}, \code{pz1_estimate()} or \code{pz1_expectedN()}. Each of these has one numerical argument, \code{n_pz1}, whose meaning depends on the function being used.}
+\item{pz1_fn}{One of the functions used to specify p(Z=1): \code{\link[=pz1_rescale]{pz1_rescale()}}, \code{\link[=pz1_estimate]{pz1_estimate()}} or \code{\link[=pz1_expectedN]{pz1_expectedN()}}. Each of these has one numerical argument, \code{n_pz1}, whose meaning depends on the function being used.}
 
 \item{cov_list}{An argument to \verb{[.props_fun()]}. This should be a list of character vectors. The elements of the list determine which groups of covariates are treated jointly. If \code{cov_dist} is "marginal" or "joint" then this is created automatically from \code{cov_cols}. If \code{cov_dist} is a list of groups of covariates to be treated jointly then the covariates to be treated marginally are filled in automatically.}
 
@@ -49,7 +49,7 @@ pz1_expectedN(n_pz1)
 
 The data frame is assigned attributes \code{cov_cols}, \code{arm_col} and \code{intervention_level}, storing the information for use in subsequent functions such as \code{\link[=matched_sample]{matched_sample()}} (if \code{use_attr} is set to \code{TRUE}).
 
-\code{.props_fun} returns a function that creates a data frame containing \code{px_int} (\eqn{p(x|Z=1)} ), \code{px_comp} \eqn{p(x)}{p(x)} and \code{ratio} (\code{px_int / px_comp}) for every combination of the levels of the covariates in \code{cov_cols}, using the approach specified via \code{cov_dist}.
+\code{\link[=.props_fun]{.props_fun()}} returns a function that creates a data frame containing \code{px_int} (\eqn{p(x|Z=1)} ), \code{px_comp} \eqn{p(x)}{p(x)} and \code{ratio} (\code{px_int / px_comp}) for every combination of the levels of the covariates in \code{cov_cols}, using the approach specified via \code{cov_dist}.
 
 \code{pz1_estimate} returns the estimate of \eqn{p(Z=1)} using the 'estimate' method (eg. a value provided by an expert). The argument is used as the estimate.
 

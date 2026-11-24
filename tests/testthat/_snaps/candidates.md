@@ -3,6 +3,9 @@
     Code
       candidates(df = eg_data, propscores = eg_j_est015, seeds = 3 * (1:10),
       smd_cols = c("risk_ass", "category", "sus_age_bin"), smd_order = 2)
+    Message
+      There are 1 NA values in the category column. These rows will be lost.
+      There are 1 NA values in the sus_age_bin column. These rows will be lost.
     Output
       # A tibble: 10 x 10
           seed n_int n_comp SMD_risk_ass SMD_category SMD_sus_age_bin
@@ -26,6 +29,9 @@
     Code
       candidates(df = eg_data, propscores = eg_j_est015, seeds = 3 * (1:10),
       smd_cols = c("risk_ass", "category", "sus_age_bin"), smd_order = 2, sampling = "downsample")
+    Message
+      There are 1 NA values in the category column. These rows will be lost.
+      There are 1 NA values in the sus_age_bin column. These rows will be lost.
     Output
       # A tibble: 10 x 10
           seed n_int n_comp SMD_risk_ass SMD_category SMD_sus_age_bin
@@ -49,6 +55,9 @@
     Code
       candidates(df = eg_data, propscores = eg_m_resc125, seeds = 3 * (1:10),
       smd_cols = c("risk_ass", "category", "sus_age_bin"), smd_order = 2)
+    Message
+      There are 1 NA values in the category column. These rows will be lost.
+      There are 1 NA values in the sus_age_bin column. These rows will be lost.
     Output
       # A tibble: 10 x 10
           seed n_int n_comp SMD_risk_ass SMD_category SMD_sus_age_bin
@@ -72,6 +81,9 @@
     Code
       candidates(df = eg_data, propscores = eg_m_resc125, seeds = 3 * (1:10),
       smd_cols = c("risk_ass", "category", "sus_age_bin"), smd_order = 2, sampling = "downsample")
+    Message
+      There are 1 NA values in the category column. These rows will be lost.
+      There are 1 NA values in the sus_age_bin column. These rows will be lost.
     Output
       # A tibble: 10 x 10
           seed n_int n_comp SMD_risk_ass SMD_category SMD_sus_age_bin
@@ -96,6 +108,8 @@
       candidates(df = eg_data, propscores = eg_mix_exp300, seeds = 3 * (1:10),
       smd_cols = c("risk_ass", "category", "sus_age_bin", "suspect_age"), smd_order = 2)
     Message
+      There are 1 NA values in the category column. These rows will be lost.
+      There are 1 NA values in the sus_age_bin column. These rows will be lost.
       The interaction SMD will not include suspect_age as it does not have class factor or character
     Output
       # A tibble: 10 x 11
@@ -122,6 +136,8 @@
       smd_cols = c("risk_ass", "category", "sus_age_bin", "suspect_age"), smd_order = 2,
       sampling = "downsample")
     Message
+      There are 1 NA values in the category column. These rows will be lost.
+      There are 1 NA values in the sus_age_bin column. These rows will be lost.
       The interaction SMD will not include suspect_age as it does not have class factor or character
     Output
       # A tibble: 10 x 11

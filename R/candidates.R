@@ -79,11 +79,49 @@ candidates <- function(
   propscores = dplyr::ungroup(propscores)
   if(n_seeds == 0)
     stop("Please supply a vector of seeds of length at least one")
+  ## Check use_attr is being used OK
+
+  if (use_attr) {
+    if (any((!is.null(cov_cols)) | (!is.null(arm_col)) | (!is.null(intervention_level)))) {
+      stop("You have set use_attr = TRUE, so all of cov_cols, arm_col and intervention_level should be NULL")
+    }
+    cov_cols <- attr(propscores, "cov_cols")
+    arm_col <- attr(propscores, "arm_col")
+    intervention_level <- attr(propscores, "intervention_level")
+  } else if (!use_attr) {
+    if (any((is.null(cov_cols)) | (is.null(arm_col)) | (is.null(intervention_level)))) {
+      stop("You have set use_attr to FALSE so cov_cols, arm_col and intervention_level must all be specified")
+    }
+  }
+
+  df <- pss_check_data(
+    df = df,
+    cov_cols = cov_cols,
+    arm_col = arm_col,
+    intervention_level = intervention_level
+  )
+
   if(length(smd_cols) == 0)
     stop("Please supply a vector of covariate names for which to find the SMD")
   if(any(!(smd_cols %in% names(df)))){
     smd_not_df = smd_cols[!(smd_cols %in% names(df))]
     stop(sprintf("The following elements of smd_cols are not columns in df: %s", paste(smd_not_df, collapse = ",")))
+  }
+  if(any(!(smd_cols %in% cov_cols))){
+    smd_not_cov = smd_cols[!(smd_cols %in% cov_cols)]
+    for (smd_i in smd_not_cov){
+      if(is.numeric(df[[smd_i]])){
+        if(length(unique(df[[smd_i]])) < 10){
+          df[[smd_i]] = as.factor(df[[smd_i]])
+          message(
+            sprintf(
+              "Column %s has been coerced to a factor with %g levels",
+              smd_i, length(unique(df[[smd_i]]))
+            )
+          )
+        }
+      }
+    }
   }
   if(smd_order > length(smd_cols))
     stop("`smd_order` should not be greater than the number of covariates in `smd_cols`")
@@ -131,7 +169,7 @@ candidates <- function(
       df = df,
       propscores = propscores,
       cov_cols = cov_cols,
-      use_attr = use_attr,
+      use_attr = FALSE, # since the attributes have aleady been used
       arm_col = arm_col,
       intervention_level = intervention_level,
       seed = seeds[j],
@@ -146,7 +184,8 @@ candidates <- function(
     for (i in 1:length(smd_cols)) {
       df_out[[smd_linear_names[i]]][j] <- smd::smd(
         x = df_j[[smd_cols[[i]]]],
-        g = df_j$Arm
+        g = df_j$Arm,
+        na.rm=TRUE
       )$estimate
     }
 
@@ -186,7 +225,8 @@ candidates <- function(
         df_int_k$Arm <- df_j$Arm # add arm (to be g in smd())
         df_out[[SMD_name_k]][j] <- smd::smd( # in the first run this adds the value to all - does it work from j=2 onwards?
           x = df_int_k[[SMD_name_k]],
-          g = df_int_k$Arm
+          g = df_int_k$Arm,
+          na.rm=TRUE
         )$estimate
       }
       order <- order + 1

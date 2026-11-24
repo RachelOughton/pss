@@ -17,7 +17,7 @@
 #' @param arm_col The name of the column indicating which rows are treated cases and which are comparison cases. These should be factor or character, with only two levels / options.
 #' @param intervention_level The value in the `arm_col` for the treatment cases
 #' @param cov_dist Either "joint" for fully joint distribution, "marginal" for fully marginal distribution, or a list of of character vectors indicating groups of covariates that should be considered jointly.
-#' @param pz1_fn One of the functions used to specify p(Z=1): `pz1_rescale()`, `pz1_estimate()` or `pz1_expectedN()`. Each of these has one numerical argument, `n_pz1`, whose meaning depends on the function being used.
+#' @param pz1_fn One of the functions used to specify p(Z=1): [pz1_rescale()], [pz1_estimate()] or [pz1_expectedN()]. Each of these has one numerical argument, `n_pz1`, whose meaning depends on the function being used.
 #' @param n_pz1 An argument to `pz1_fn`. Its meaning depends on the function used for `pz1_fn`.
 #' @param cov_list An argument to `[.props_fun()]`. This should be a list of character vectors. The elements of the list determine which groups of covariates are treated jointly. If `cov_dist` is "marginal" or "joint" then this is created automatically from `cov_cols`. If `cov_dist` is a list of groups of covariates to be treated jointly then the covariates to be treated marginally are filled in automatically.
 #'
@@ -132,7 +132,7 @@ propscores <- function(
 }
 
 #' @describeIn propscores Find table of estimates of \eqn{p(x)}{p(x)}, \eqn{p(x|Z=1)} and their ratio using fully joint approach
-#' @return `.props_fun` returns a function that creates a data frame containing `px_int` (\eqn{p(x|Z=1)} ), `px_comp` \eqn{p(x)}{p(x)} and `ratio` (`px_int / px_comp`) for every combination of the levels of the covariates in `cov_cols`, using the approach specified via `cov_dist`.
+#' @return [.props_fun()] returns a function that creates a data frame containing `px_int` (\eqn{p(x|Z=1)} ), `px_comp` \eqn{p(x)}{p(x)} and `ratio` (`px_int / px_comp`) for every combination of the levels of the covariates in `cov_cols`, using the approach specified via `cov_dist`.
 
 #' @export
 
@@ -278,7 +278,6 @@ propscores <- function(
       )
     )
 
-#  df_out$ratio[df_out$count_int ==0] = 0 # No! This leads to marginal approach being overwritten!
   return(df_out)
 }
 

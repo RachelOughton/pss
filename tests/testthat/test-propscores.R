@@ -349,6 +349,21 @@ test_that("List, expected N of 300", {
     )
   )})
 
+
+test_that("More covs (some 00), FM_equip", {
+  expect_snapshot(
+    propscores(
+      df = eg_data,
+      cov_cols = c("risk_ass", "category", "sus_age_bin", "nprev_sus_bin"),
+      arm_col = "FM_equip",
+      intervention_level = T,
+      cov_dist = "joint",
+      pz1_fn = pz1_expectedN(300)
+    )
+  )})
+
+
+
 ## Tests if it works with character columns
 
 eg_data_char = eg_data
