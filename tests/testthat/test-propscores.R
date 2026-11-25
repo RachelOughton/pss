@@ -7,10 +7,10 @@
 test_that("error1",{
   expect_error(
     propscores(
-      df = eg_data,
+      df = fm_data,
       cov_cols = c("risk_ass", "category", "sus_age_bin"),
-      arm_col = "Arm",
-      intervention_level = "Intervention",
+      arm_col = "FM_equip",
+      intervention_level = TRUE,
       cov_dist = list(c("risk_ass", "category", "victim_age")),
       pz1_fn = pz1_expectedN(300)
     )
@@ -22,18 +22,18 @@ test_that("error1",{
 test_that("Joint, different cases", {
   expect_equal(
     propscores(
-      df = eg_data,
+      df = fm_data,
       cov_cols = c("risk_ass", "category", "sus_age_bin"),
-      arm_col = "Arm",
-      intervention_level = "Intervention",
+      arm_col = "FM_equip",
+      intervention_level = TRUE,
       cov_dist = "joint",
       pz1_fn = pz1_rescale(1)
     ),
     propscores(
-      df = eg_data,
+      df = fm_data,
       cov_cols = c("risk_ass", "category", "sus_age_bin"),
-      arm_col = "Arm",
-      intervention_level = "Intervention",
+      arm_col = "FM_equip",
+      intervention_level = TRUE,
       cov_dist = "JOINT",
       pz1_fn = pz1_rescale(1)
     )
@@ -42,18 +42,18 @@ test_that("Joint, different cases", {
 test_that("Marginal, different cases", {
   expect_equal(
     propscores(
-      df = eg_data,
+      df = fm_data,
       cov_cols = c("risk_ass", "category", "sus_age_bin"),
-      arm_col = "Arm",
-      intervention_level = "Intervention",
+      arm_col = "FM_equip",
+      intervention_level = TRUE,
       cov_dist = "marginal",
       pz1_fn = pz1_rescale(1)
     ),
     propscores(
-      df = eg_data,
+      df = fm_data,
       cov_cols = c("risk_ass", "category", "sus_age_bin"),
-      arm_col = "Arm",
-      intervention_level = "Intervention",
+      arm_col = "FM_equip",
+      intervention_level = TRUE,
       cov_dist = "MARGINAL",
       pz1_fn = pz1_rescale(1)
     )
@@ -65,7 +65,9 @@ test_that("Marginal, different cases", {
 
 
 test_that("Joint, rescale to 1.5", {
-  eg_counts = eg_data |> dplyr::group_by(category, risk_ass, sus_age_bin, Arm) |> dplyr::summarise(n=dplyr::n())
+  fm_data$Arm = "Intervention"
+  fm_data$Arm[!(fm_data$FM_equip)] = "Comparison"
+  eg_counts = fm_data |> dplyr::group_by(category, risk_ass, sus_age_bin, Arm) |> dplyr::summarise(n=dplyr::n())
   eg_counts = na.omit(eg_counts)
   n_int = sum(eg_counts[["n"]][eg_counts$Arm == "Intervention"])
   n_comp = sum(eg_counts[["n"]][eg_counts$Arm == "Comparison"])
@@ -82,10 +84,10 @@ test_that("Joint, rescale to 1.5", {
 
 
   ps_test1 =propscores(
-    df = eg_data,
+    df = fm_data,
     cov_cols = c("risk_ass", "category", "sus_age_bin"),
-    arm_col = "Arm",
-    intervention_level = "Intervention",
+    arm_col = "FM_equip",
+    intervention_level = TRUE,
     cov_dist = "joint",
     pz1_fn = pz1_rescale(1)
   )
@@ -188,10 +190,10 @@ test_that("Joint, rescale to 1.5", {
 test_that("Marginal, estimate of 0.01", {
 
     ps_test2 = propscores(
-      df = eg_data,
+      df = fm_data,
       cov_cols = c("risk_ass", "category", "sus_age_bin"),
-      arm_col = "Arm",
-      intervention_level = "Intervention",
+      arm_col = "FM_equip",
+      intervention_level = TRUE,
       cov_dist = "marginal",
       pz1_fn = pz1_estimate(0.01)
     )
@@ -211,10 +213,11 @@ test_that("Marginal, estimate of 0.01", {
 
 
     ## Choose some combinations and calculate by hand
-
+    fm_data$Arm = "Intervention"
+    fm_data$Arm[!fm_data$FM_equip] = "Comparison"
     # Course of conduct, MEDIUM, 33-39
     # Theft / CD, MEDIUM, 33-39
-    eg_notna = eg_data |>
+    eg_notna = fm_data |>
       tidyr::drop_na(any_of(c("risk_ass", "category", "sus_age_bin")))
     tot_int = sum(eg_notna$Arm == "Intervention")
     tot_comp = sum(eg_notna$Arm == "Comparison")
@@ -340,10 +343,10 @@ test_that("Marginal, estimate of 0.01", {
 test_that("List, expected N of 300", {
   expect_snapshot(
     propscores(
-      df = eg_data,
+      df = fm_data,
       cov_cols = c("risk_ass", "category", "sus_age_bin"),
-      arm_col = "Arm",
-      intervention_level = "Intervention",
+      arm_col = "FM_equip",
+      intervention_level = TRUE,
       cov_dist = list(c("risk_ass", "category")),
       pz1_fn = pz1_expectedN(300)
     )
@@ -353,7 +356,7 @@ test_that("List, expected N of 300", {
 test_that("More covs (some 00), FM_equip", {
   expect_snapshot(
     propscores(
-      df = eg_data,
+      df = fm_data,
       cov_cols = c("risk_ass", "category", "sus_age_bin", "nprev_sus_bin"),
       arm_col = "FM_equip",
       intervention_level = T,
@@ -366,18 +369,18 @@ test_that("More covs (some 00), FM_equip", {
 
 ## Tests if it works with character columns
 
-eg_data_char = eg_data
-eg_data_char$risk_ass = as.character(eg_data$risk_ass)
-eg_data_char$category = as.character(eg_data$category)
+fm_data_char = fm_data
+fm_data_char$risk_ass = as.character(fm_data$risk_ass)
+fm_data_char$category = as.character(fm_data$category)
 
 
 test_that("Char, Joint, rescale to 1.5", {
   expect_snapshot(
     propscores(
-      df = eg_data_char,
+      df = fm_data_char,
       cov_cols = c("risk_ass", "category", "sus_age_bin"),
-      arm_col = "Arm",
-      intervention_level = "Intervention",
+      arm_col = "FM_equip",
+      intervention_level = TRUE,
       cov_dist = "joint",
       pz1_fn = pz1_rescale(1)
     )
@@ -386,10 +389,10 @@ test_that("Char, Joint, rescale to 1.5", {
 test_that("Char, Marginal, estimate of 0.01", {
   expect_snapshot(
     propscores(
-      df = eg_data_char,
+      df = fm_data_char,
       cov_cols = c("risk_ass", "category", "sus_age_bin"),
-      arm_col = "Arm",
-      intervention_level = "Intervention",
+      arm_col = "FM_equip",
+      intervention_level = TRUE,
       cov_dist = "marginal",
       pz1_fn = pz1_estimate(0.01)
     )
@@ -399,10 +402,10 @@ test_that("Char, Marginal, estimate of 0.01", {
 test_that("Char, List, expected N of 300", {
   expect_snapshot(
     propscores(
-      df = eg_data_char,
+      df = fm_data_char,
       cov_cols = c("risk_ass", "category", "sus_age_bin"),
-      arm_col = "Arm",
-      intervention_level = "Intervention",
+      arm_col = "FM_equip",
+      intervention_level = TRUE,
       cov_dist = list(c("risk_ass", "category")),
       pz1_fn = pz1_expectedN(300)
     )

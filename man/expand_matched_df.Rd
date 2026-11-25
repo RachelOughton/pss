@@ -13,7 +13,7 @@ expand_matched_df(matched_df)
 \code{\link[=expand_matched_df]{expand_matched_df()}} returns a data frame with all the columns of \code{matched_df} except include. Each row (row \code{i}) is now included \code{include[i]} times. That is, rows with \code{matched_df$include[i]==0} are omitted from the returned data frame, and rows with \code{matched_df$include[i] > 1} are included multiple times.
 }
 \description{
-Expand a matched comparison data frame
+\code{\link[=expand_matched_df]{expand_matched_df()}} uses the \code{include} column in a matched dataset created by \code{\link[=matched_sample]{matched_sample()}} to format the matched dataset so that it is appropriate for subsequent use. It does this by including each row \code{include} times, so that rows with \code{include == 0} are dropped and rows with \code{include > 1} are repeated.
 }
 \examples{
 ## First use `propscores` to create a propensity score data frame
@@ -21,10 +21,10 @@ Expand a matched comparison data frame
 ## that the expected size of the comparison group is 300
 
 eg_j_exp300 <- propscores(
-  df = eg_data,
+  df = fm_data,
   cov_cols = c("risk_ass", "category", "sus_age_bin"),
-  arm_col = "Arm",
-  intervention_level = "Intervention",
+  arm_col = "FM_equip",
+  intervention_level = TRUE,
   cov_dist = "joint",
   pz1_fn = pz1_expectedN(300)
 )
@@ -35,7 +35,7 @@ eg_j_exp300 <- propscores(
 ## comparison cases to sample
 
 match_j_exp300_replace <- matched_sample(
-  df = eg_data,
+  df = fm_data,
   propscores = eg_j_exp300,
   seed = 20,
   sampling = "repeat",

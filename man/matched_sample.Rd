@@ -17,7 +17,7 @@ matched_sample(
 )
 }
 \arguments{
-\item{df}{A data frame containing treatment group and comparison cohort data. These should}
+\item{df}{A data frame containing treated / intervention group and comparison cohort data.}
 
 \item{propscores}{A data frame with a column for each variable in \code{cov_cols} and a \code{PropScore} column giving the estimated propensity score for each combination of their levels. This should (usually) have been created by \code{\link[=propscores]{propscores()}} using \code{df} as input.}
 
@@ -54,7 +54,7 @@ The data frame can be expanded into a usable data frame (that is, with row \code
 }
 }
 \description{
-\code{\link[=matched_sample]{matched_sample()}} uses propensity score sampling to generate a matched sample.
+\code{\link[=matched_sample]{matched_sample()}} uses propensity score sampling to generate a matched sample for a dataset containing covariate data for two groups (treated / intervention and comparison). The data frame returned by \code{\link[=matched_sample]{matched_sample()}} has the same number of rows as \code{df} and an extra column \code{include}, indicating how many times each row is included in the matcehd dataset. To format the matched dataset for use in any subsequent analysis, use \code{\link[=expand_matched_df]{expand_matched_df()}}.
 }
 \examples{
 
@@ -63,10 +63,10 @@ The data frame can be expanded into a usable data frame (that is, with row \code
 ## that the expected size of the comparison group is 300
 
 eg_j_exp300 <- propscores(
-  df = eg_data,
+  df = fm_data,
   cov_cols = c("risk_ass", "category", "sus_age_bin"),
-  arm_col = "Arm",
-  intervention_level = "Intervention",
+  arm_col = "FM_equip",
+  intervention_level = TRUE,
   cov_dist = "joint",
   pz1_fn = pz1_expectedN(300)
 )
@@ -77,7 +77,7 @@ eg_j_exp300 <- propscores(
 ## and do not drop any intervention cases for which there are no
 ## comparison cases to sample
 match_j_exp300_repeat <- matched_sample(
-  df = eg_data,
+  df = fm_data,
   propscores = eg_j_exp300,
   seed = 20,
   sampling = "repeat",
@@ -86,5 +86,5 @@ match_j_exp300_repeat <- matched_sample(
 
 }
 \seealso{
-\code{\link[=expand_matched_df]{expand_matched_df()}} \code{\link[=dropped_cases]{dropped_cases()}}
+\code{\link[=expand_matched_df]{expand_matched_df()}}, \code{\link[=dropped_cases]{dropped_cases()}}, \code{\link[=repeat_cases]{repeat_cases()}}
 }

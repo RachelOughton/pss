@@ -1,11 +1,11 @@
-load("data/eg_data.rda")
+load("data/fm_data.rda")
 
 
 ## After merging functions into props_fun
 
 
 eg_j_est1 = propscores(
-  df = eg_data,
+  df = fm_data,
   cov_cols = c("risk_ass", "category", "sus_age_bin"),
   arm_col = "Arm",
   intervention_level = "Intervention",
@@ -14,7 +14,7 @@ eg_j_est1 = propscores(
 )
 
 eg_m_resc15 = propscores(
-  df = eg_data,
+  df = fm_data,
   cov_cols = c("risk_ass", "category", "sus_age_bin"),
   arm_col = "Arm",
   intervention_level = "Intervention",
@@ -23,7 +23,7 @@ eg_m_resc15 = propscores(
 )
 
 eg_mix_exp100 = propscores(
-  df = eg_data,
+  df = fm_data,
   cov_cols = c("risk_ass", "category", "sus_age_bin"),
   arm_col = "Arm",
   intervention_level = "Intervention",
@@ -35,7 +35,7 @@ eg_mix_exp100 = propscores(
 
 
 eg_j_np_est1 = propscores(
-  df = eg_data,
+  df = fm_data,
   cov_cols = c("risk_ass", "category", "nprev_sus_bin", "sus_age_bin"),
   arm_col = "Arm",
   intervention_level = "Intervention",
@@ -44,7 +44,7 @@ eg_j_np_est1 = propscores(
 )
 
 eg_m_np_est1 = propscores(
-  df = eg_data,
+  df = fm_data,
   cov_cols = c("risk_ass", "category", "nprev_sus_bin", "sus_age_bin"),
   arm_col = "Arm",
   intervention_level = "Intervention",

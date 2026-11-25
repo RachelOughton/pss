@@ -1,7 +1,7 @@
 # Joint, estimate 0.15
 
     Code
-      candidates(df = eg_data, propscores = eg_j_est015, seeds = 3 * (1:10),
+      candidates(df = fm_data, propscores = eg_j_est015, seeds = 3 * (1:10),
       smd_cols = c("risk_ass", "category", "sus_age_bin"), smd_order = 2)
     Message
       There are 1 NA values in the category column. These rows will be lost.
@@ -27,7 +27,7 @@
 ---
 
     Code
-      candidates(df = eg_data, propscores = eg_j_est015, seeds = 3 * (1:10),
+      candidates(df = fm_data, propscores = eg_j_est015, seeds = 3 * (1:10),
       smd_cols = c("risk_ass", "category", "sus_age_bin"), smd_order = 2, sampling = "downsample")
     Message
       There are 1 NA values in the category column. These rows will be lost.
@@ -53,7 +53,7 @@
 # Marginal, rescale to 1.25
 
     Code
-      candidates(df = eg_data, propscores = eg_m_resc125, seeds = 3 * (1:10),
+      candidates(df = fm_data, propscores = eg_m_resc125, seeds = 3 * (1:10),
       smd_cols = c("risk_ass", "category", "sus_age_bin"), smd_order = 2)
     Message
       There are 1 NA values in the category column. These rows will be lost.
@@ -79,7 +79,7 @@
 ---
 
     Code
-      candidates(df = eg_data, propscores = eg_m_resc125, seeds = 3 * (1:10),
+      candidates(df = fm_data, propscores = eg_m_resc125, seeds = 3 * (1:10),
       smd_cols = c("risk_ass", "category", "sus_age_bin"), smd_order = 2, sampling = "downsample")
     Message
       There are 1 NA values in the category column. These rows will be lost.
@@ -105,7 +105,7 @@
 # semi-marginal, expectedN 300
 
     Code
-      candidates(df = eg_data, propscores = eg_mix_exp300, seeds = 3 * (1:10),
+      candidates(df = fm_data, propscores = eg_mix_exp300, seeds = 3 * (1:10),
       smd_cols = c("risk_ass", "category", "sus_age_bin", "suspect_age"), smd_order = 2)
     Message
       There are 1 NA values in the category column. These rows will be lost.
@@ -132,7 +132,7 @@
 ---
 
     Code
-      candidates(df = eg_data, propscores = eg_mix_exp300, seeds = 3 * (1:10),
+      candidates(df = fm_data, propscores = eg_mix_exp300, seeds = 3 * (1:10),
       smd_cols = c("risk_ass", "category", "sus_age_bin", "suspect_age"), smd_order = 2,
       sampling = "downsample")
     Message

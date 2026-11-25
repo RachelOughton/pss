@@ -1,5 +1,7 @@
 #' Expand a matched comparison data frame
 #'
+#' [expand_matched_df()] uses the `include` column in a matched dataset created by [matched_sample()] to format the matched dataset so that it is appropriate for subsequent use. It does this by including each row `include` times, so that rows with `include == 0` are dropped and rows with `include > 1` are repeated.
+#'
 #' @name expand_matched_df
 #' @param matched_df A data frame output by [matched_sample()]. This should contain columns for `arm_col`, all elements of `cov_cols` and `include`. It can also contain other columns.
 #' @return [expand_matched_df()] returns a data frame with all the columns of `matched_df` except include. Each row (row `i`) is now included `include[i]` times. That is, rows with `matched_df$include[i]==0` are omitted from the returned data frame, and rows with `matched_df$include[i] > 1` are included multiple times.
@@ -12,10 +14,10 @@
 #' ## that the expected size of the comparison group is 300
 #'
 #' eg_j_exp300 <- propscores(
-#'   df = eg_data,
+#'   df = fm_data,
 #'   cov_cols = c("risk_ass", "category", "sus_age_bin"),
-#'   arm_col = "Arm",
-#'   intervention_level = "Intervention",
+#'   arm_col = "FM_equip",
+#'   intervention_level = TRUE,
 #'   cov_dist = "joint",
 #'   pz1_fn = pz1_expectedN(300)
 #' )
@@ -26,7 +28,7 @@
 #' ## comparison cases to sample
 #'
 #' match_j_exp300_replace <- matched_sample(
-#'   df = eg_data,
+#'   df = fm_data,
 #'   propscores = eg_j_exp300,
 #'   seed = 20,
 #'   sampling = "repeat",

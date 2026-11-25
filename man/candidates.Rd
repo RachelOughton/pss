@@ -2,7 +2,7 @@
 % Please edit documentation in R/candidates.R
 \name{candidates}
 \alias{candidates}
-\title{Create a summary table for a vector of seeds}
+\title{Summarise balance and size of matched samples for a vector of seeds}
 \usage{
 candidates(
   df,
@@ -52,7 +52,11 @@ candidates(
 }
 }
 \description{
-Create a summary table for a vector of seeds
+\code{\link[=candidates]{candidates()}} runs \code{\link[=matched_sample]{matched_sample()}} for each seed value in \code{seeds}, and summarises the size and balance of each candidate matched dataset.
+
+The sizes of the comparison and treated groups for each candidate dataset are given in columns \code{n_comp} and \code{n_int}, and the balance is assessed using the standardised mean difference (SMD). Balance can be assessed for marginally for numerical and categorical covariates, and for interactions of categorical covariates.
+
+The arguments \code{sampling} and \code{drop_int} are passed on to \code{\link[=matched_sample]{matched_sample()}} to determine how the propensity score sampling approach is performed.
 }
 \examples{
 ## First use `propscores` to create a propensity score data frame
@@ -60,10 +64,10 @@ Create a summary table for a vector of seeds
 ## that the expected size of the comparison group is 300
 
 eg_j_exp300 <- propscores(
-  df = eg_data,
+  df = fm_data,
   cov_cols = c("risk_ass", "category", "sus_age_bin"),
-  arm_col = "Arm",
-  intervention_level = "Intervention",
+  arm_col = "FM_equip",
+  intervention_level = TRUE,
   cov_dist = "joint",
   pz1_fn = pz1_expectedN(300)
 )
@@ -78,7 +82,7 @@ eg_j_exp300 <- propscores(
 ## `suspect_age` is numeric it will not be included in the interactions.
 
 candidates(
-  df = eg_data,
+  df = fm_data,
   propscores = eg_j_exp300,
   seeds = 1:20,
   smd_cols = c("suspect_age", "category", "risk_ass", "sus_age_bin"),

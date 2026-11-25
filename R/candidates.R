@@ -1,4 +1,11 @@
-#' Create a summary table for a vector of seeds
+#' Summarise balance and size of matched samples for a vector of seeds
+#'
+#'
+#' @description [candidates()] runs [matched_sample()] for each seed value in `seeds`, and summarises the size and balance of each candidate matched dataset.
+#'
+#' The sizes of the comparison and treated groups for each candidate dataset are given in columns `n_comp` and `n_int`, and the balance is assessed using the standardised mean difference (SMD). Balance can be assessed for marginally for numerical and categorical covariates, and for interactions of categorical covariates.
+#'
+#' The arguments `sampling` and `drop_int` are passed on to [matched_sample()] to determine how the propensity score sampling approach is performed.
 #'
 #'
 #' @name candidates
@@ -31,10 +38,10 @@
 #' ## that the expected size of the comparison group is 300
 #'
 #' eg_j_exp300 <- propscores(
-#'   df = eg_data,
+#'   df = fm_data,
 #'   cov_cols = c("risk_ass", "category", "sus_age_bin"),
-#'   arm_col = "Arm",
-#'   intervention_level = "Intervention",
+#'   arm_col = "FM_equip",
+#'   intervention_level = TRUE,
 #'   cov_dist = "joint",
 #'   pz1_fn = pz1_expectedN(300)
 #' )
@@ -49,7 +56,7 @@
 #' ## `suspect_age` is numeric it will not be included in the interactions.
 #'
 #' candidates(
-#'   df = eg_data,
+#'   df = fm_data,
 #'   propscores = eg_j_exp300,
 #'   seeds = 1:20,
 #'   smd_cols = c("suspect_age", "category", "risk_ass", "sus_age_bin"),

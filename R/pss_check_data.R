@@ -1,6 +1,6 @@
 #' Check data
 #'
-#' `pss_check_data` checks that the data frame provided is suitable. Will return either a very slightly cleaned up version, or an error message.
+#' [pss_check_data()] checks that the data frame provided is suitable. Will return either a very slightly cleaned up version, or an error message. [pss_check_data()] is called by several other functions in `pss` but should not need to be called by the user.
 #' The function does the following:
 #' - checks the `arm_col` column has two unique values, one of which is `intervention_level`
 #' - adds an `Arm` column, with two levels ("Intervention" and "Comparison")
@@ -13,14 +13,15 @@
 #' @param arm_col The name of the column indicating which rows are treated cases and which are comparison cases. These should be factor or character, with only two levels / options.
 #' @param intervention_level The value in the `arm_col` for the treatment cases
 #' @return `pss_check_data` returns a (possibly slightly tidied up) data frame or an error message. The data frame will have an `Arm` column with levels `Intervention` and `Comparison`.
+#' @keywords internal
 #' @export
 #'
 #' @examples
 #' pss_check_data(
-#'   df = eg_data,
+#'   df = fm_data,
 #'   cov_cols = c("risk_ass", "category", "sus_age_bin"),
-#'   arm_col = "Arm",
-#'   intervention_level = "Intervention"
+#'   arm_col = "FM_equip",
+#'   intervention_level = TRUE
 #' )
 #' @importFrom rlang .data
 

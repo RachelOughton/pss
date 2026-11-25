@@ -2,7 +2,7 @@
 % Please edit documentation in R/repeat_cases.R
 \name{repeat_cases}
 \alias{repeat_cases}
-\title{Display the comparison cases that will be repeated for a particular matched sample}
+\title{Display repeated comparison cases for a particular matched sample}
 \usage{
 repeat_cases(matched_df, use_attr = TRUE, cov_cols = NULL)
 }
@@ -23,7 +23,7 @@ repeat_cases(matched_df, use_attr = TRUE, cov_cols = NULL)
 }
 }
 \description{
-Display the comparison cases that will be repeated for a particular matched sample
+\code{\link[=repeat_cases]{repeat_cases()}} tabulates the comparison cases that are repeated for a particular matched dataset, using the \code{include} column created by \code{\link[=matched_sample]{matched_sample()}}.
 }
 \examples{
 ## First use [propscores()] to create a propensity score data frame
@@ -31,10 +31,10 @@ Display the comparison cases that will be repeated for a particular matched samp
 ## that the expected size of the comparison group is 300
 
 eg_j_exp300 <- propscores(
-  df = eg_data,
+  df = fm_data,
   cov_cols = c("risk_ass", "category", "sus_age_bin"),
-  arm_col = "Arm",
-  intervention_level = "Intervention",
+  arm_col = "FM_equip",
+  intervention_level = TRUE,
   cov_dist = "joint",
   pz1_fn = pz1_expectedN(300)
 )
@@ -45,7 +45,7 @@ eg_j_exp300 <- propscores(
 ## comparison cases to sample
 
 match_j_exp300_rep <- matched_sample(
-  df = eg_data,
+  df = fm_data,
   propscores = eg_j_exp300,
   seed = 20,
   sampling = "repeat",

@@ -36,7 +36,7 @@ library(pss)
 
 The suggested workflow is as follows:
 
-  1. **Prepare data**. Any continuous variable to be used in matching should be binned into an ordinal variable.
+  1. **Prepare data**. Any continuous variable to be used in matching should be binned into an ordinal variable. This can be done using `quantile_bin()` and `breaks_bin()`
   2. **Estimate propensity scores** using `propscores()`
   3. **Generate and investigate a set of candidate matched samples** using `candidates()` and `plot_smd()` and select the best `seed`.
   4. **Generate the final matched dataset** using `matched_sample()`, by fixing `seed` to the value chosen above. The dataset can be further investigated using `dropped_cases()`, and formatted for analysis by `expand_matched_df()`.
@@ -96,10 +96,10 @@ Unlike $p(\mathbf{x}|Z=1)$ and $p(\mathbf{x})$, $p(Z=1)$ cannot be estimated fro
 The example data are ...
 
 ```{r, echo=F}
-eg_data$nprev_sus_bin = "zero"
-eg_data$nprev_sus_bin[eg_data$nprev_sus > 0] = "one"
-eg_data$nprev_sus_bin[eg_data$nprev_sus > 1] = "2 plus"
-eg_data$nprev_sus_bin = factor(eg_data$nprev_sus_bin, levels = c("zero", "one", "2 plus"))
+fm_data$nprev_sus_bin = "zero"
+fm_data$nprev_sus_bin[fm_data$nprev_sus > 0] = "one"
+fm_data$nprev_sus_bin[fm_data$nprev_sus > 1] = "2 plus"
+fm_data$nprev_sus_bin = factor(fm_data$nprev_sus_bin, levels = c("zero", "one", "2 plus"))
 ```
 
 ### Joint approach, expected comparison group size 315
@@ -108,10 +108,10 @@ We will first estimate propensity scores using the fully joint approach. In this
 
 ```{r}
 ps_joint_est03 = propscores(
-  df = eg_data,
+  df = fm_data,
   cov_cols = c("risk_ass", "nprev_sus_bin"),
-  arm_col = "Arm",
-  intervention_level = "Intervention",
+  arm_col = "FM_equip",
+  intervention_level = TRUE,
   cov_dist = "joint",
   pz1_fn = pz1_estimate(0.3)
 )
@@ -129,10 +129,10 @@ We could alternatively use the marginal estimation method
 
 ```{r}
 ps_marg_est03 = propscores(
-  df = eg_data,
+  df = fm_data,
   cov_cols = c("risk_ass", "nprev_sus_bin"),
-  arm_col = "Arm",
-  intervention_level = "Intervention",
+  arm_col = "FM_equip",
+  intervention_level = TRUE,
   cov_dist = "marginal",
   pz1_fn = pz1_estimate(0.3)
 )
@@ -165,7 +165,7 @@ We can generate candidates using `ps_joint_est03`, repeat-sampling comparison ca
 
 ```{r, cache=T}
 cand_simp1 = candidates(
-  df = eg_data,
+  df = fm_data,
   propscores = ps_joint_est03,
   seeds = 1:100,
   smd_cols = c("risk_ass", "nprev_sus_bin"),
@@ -202,7 +202,7 @@ For this example we will choose `seed = 97`. We can now create that matched samp
 
 ```{r}
 matched_df_97 = matched_sample(
-  df = eg_data,
+  df = fm_data,
   propscores = ps_joint_est03,
   seed = 97
 )
@@ -232,10 +232,10 @@ This shows us that two types of comparison case are being repeat sampled. Since 
 
 ```{r}
 ps_joint_exp315 = propscores(
-  df = eg_data,
+  df = fm_data,
   cov_cols = c("sus_age_bin", "category", "risk_ass", "nprev_sus_bin"),
-  arm_col = "Arm",
-  intervention_level = "Intervention",
+  arm_col = "FM_equip",
+  intervention_level = TRUE,
   cov_dist = "joint",
   pz1_fn = pz1_expectedN(315)
 )
@@ -272,7 +272,7 @@ Here we make the following choices:
 
 ```{r, cache=T}
 cand1 = candidates(
-  df = eg_data,
+  df = fm_data,
   propscores = ps_joint_exp315,
   seeds = 251:500,
   sampling = "repeat",
@@ -306,7 +306,7 @@ Because there are several propensity scores over 10, each for a single compariso
 
 ```{r, cache=T}
 cand2 = candidates(
-  df = eg_data,
+  df = fm_data,
   propscores = ps_joint_exp315,
   seeds = 251:500,
   sampling = "downsample",
@@ -346,10 +346,10 @@ We might want to try using the joint density for `nprev_sus_bin`, `category` and
 
 ```{r}
 ps_mixed_exp315 = propscores(
-  df = eg_data,
+  df = fm_data,
   cov_cols = c("sus_age_bin", "category", "risk_ass", "nprev_sus_bin"),
-  arm_col = "Arm",
-  intervention_level = "Intervention",
+  arm_col = "FM_equip",
+  intervention_level = TRUE,
   cov_dist = list(c("nprev_sus_bin", "category", "risk_ass")),
   pz1_fn = pz1_expectedN(315)
 )
@@ -377,7 +377,7 @@ Keeping the sampling choices as for `cand2` (downsampling treated cases and drop
 
 ```{r, cache=T}
 cand3 = candidates(
-  df = eg_data,
+  df = fm_data,
   propscores = ps_mixed_exp315,
   seeds = 1:500,
   sampling = "downsample",
@@ -413,7 +413,7 @@ summary(cand3$n_comp)
 
 <!-- ```{r} -->
 <!-- cand2 = candidates( -->
-<!--   df = eg_data, -->
+<!--   df = fm_data, -->
 <!--   propscores = ps_mix_exp250, -->
 <!--   seeds = 1:250, -->
 <!--   sampling = "repeat", -->
@@ -455,7 +455,7 @@ We create this dataset by
 
 ```{r}
 matched_sample_final = matched_sample(
-  df= eg_data,
+  df= fm_data,
   propscores= ps_joint_exp315,
   seed = 421,
   sampling = "downsample",
@@ -463,7 +463,7 @@ matched_sample_final = matched_sample(
 )
 ```
 
-`matched_sample_final` contains the same rows as `eg_data` and a column `include`, which indicates how many times each row is to be included. Since we have selected `sampling = "downsample"` the `include` values will all be 0 or 1. If we had set `sampling = "repeat"` then some comparison cases would have `include`>1.
+`matched_sample_final` contains the same rows as `fm_data` and a column `include`, which indicates how many times each row is to be included. Since we have selected `sampling = "downsample"` the `include` values will all be 0 or 1. If we had set `sampling = "repeat"` then some comparison cases would have `include`>1.
 
 We can summarise the dropped treated cases using `dropped_cases()`
 

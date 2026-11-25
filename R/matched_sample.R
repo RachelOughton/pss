@@ -1,10 +1,10 @@
 #' Form a matched sample
 #'
 #' @description
-#' [matched_sample()] uses propensity score sampling to generate a matched sample.
+#' [matched_sample()] uses propensity score sampling to generate a matched sample for a dataset containing covariate data for two groups (treated / intervention and comparison). The data frame returned by [matched_sample()] has the same number of rows as `df` and an extra column `include`, indicating how many times each row is included in the matcehd dataset. To format the matched dataset for use in any subsequent analysis, use [expand_matched_df()].
 #'
 #' @name matched_sample
-#' @param df A data frame containing treatment group and comparison cohort data. These should
+#' @param df A data frame containing treated / intervention group and comparison cohort data.
 #' @param propscores A data frame with a column for each variable in `cov_cols` and a `PropScore` column giving the estimated propensity score for each combination of their levels. This should (usually) have been created by [propscores()] using `df` as input.
 #' @param seed The random seed to be used, for reproducibility
 #' @param sampling character. What should happen when there aren't enough comparison cases to cover the treated cases. Should be one of `repeat` (to repeat-sample the comparison cases) and `downsample` (to drop treated cases)
@@ -27,7 +27,7 @@
 #'   - How many (if any) intervention cases have been dropped because there are no similar comparison cases to sample from, if `drop_int == TRUE`
 #'   - How many (if any) intervention cases have been kept even though there are no similar comparison cases to sample from, if `drop_int == TRUE`
 #'
-#' @seealso [expand_matched_df()] [dropped_cases()]
+#' @seealso [expand_matched_df()], [dropped_cases()], [repeat_cases()]
 #' @export
 #' @importFrom stats runif
 #'
@@ -38,10 +38,10 @@
 #' ## that the expected size of the comparison group is 300
 #'
 #' eg_j_exp300 <- propscores(
-#'   df = eg_data,
+#'   df = fm_data,
 #'   cov_cols = c("risk_ass", "category", "sus_age_bin"),
-#'   arm_col = "Arm",
-#'   intervention_level = "Intervention",
+#'   arm_col = "FM_equip",
+#'   intervention_level = TRUE,
 #'   cov_dist = "joint",
 #'   pz1_fn = pz1_expectedN(300)
 #' )
@@ -52,7 +52,7 @@
 #' ## and do not drop any intervention cases for which there are no
 #' ## comparison cases to sample
 #' match_j_exp300_repeat <- matched_sample(
-#'   df = eg_data,
+#'   df = fm_data,
 #'   propscores = eg_j_exp300,
 #'   seed = 20,
 #'   sampling = "repeat",

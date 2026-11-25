@@ -1,4 +1,6 @@
-#' Display the comparison cases that will be repeated for a particular matched sample
+#' Display repeated comparison cases for a particular matched sample
+#'
+#' [repeat_cases()] tabulates the comparison cases that are repeated for a particular matched dataset, using the `include` column created by [matched_sample()].
 #'
 #' @name repeat_cases
 #' @param matched_df A data frame output by [matched_sample()]. This should contain columns for `arm_col`, all elements of `cov_cols` and `include`. It must have the `Arm` column with levels `"Intervention"` and `"Comparison"`. It may also contain other columns.
@@ -18,10 +20,10 @@
 #' ## that the expected size of the comparison group is 300
 #'
 #' eg_j_exp300 <- propscores(
-#'   df = eg_data,
+#'   df = fm_data,
 #'   cov_cols = c("risk_ass", "category", "sus_age_bin"),
-#'   arm_col = "Arm",
-#'   intervention_level = "Intervention",
+#'   arm_col = "FM_equip",
+#'   intervention_level = TRUE,
 #'   cov_dist = "joint",
 #'   pz1_fn = pz1_expectedN(300)
 #' )
@@ -32,7 +34,7 @@
 #' ## comparison cases to sample
 #'
 #' match_j_exp300_rep <- matched_sample(
-#'   df = eg_data,
+#'   df = fm_data,
 #'   propscores = eg_j_exp300,
 #'   seed = 20,
 #'   sampling = "repeat",

@@ -1,13 +1,17 @@
 #' Example forensic marking study data
 #'
-#' An anonymised and slightly altered version of data from a study investigating forensic marking to protect victims of domestic abuse in the UK
+#' An anonymised and slightly altered version of data from a study investigating forensic marking to protect victims of intimate partner abuse in the UK
 #'
-#' @format ## `eg_data`
-#' A data frame with 999 rows and 20 columns:
+#' @format ## `fm_data`
+#' A data frame with 999 rows and 8 columns. The columns used
 #' \describe{
 #'   \item{FM_equip}{Whether the victim was given forensic marking equipment}
-#'   \item{warning_YN}{Whether the perpetrator was warned about the use of forensic marking equipment (can only be `Y` if `FM_equip` is TRUE)}
-#'   \item{princ_crime}{The principal crime committed at the reference incident, according to the home office lookup table}
-#'   ...
+#'   \item{risk_ass}{The risk assessment level assigned to the victim (either `MEDIUM` or `HIGH`)}
+#'   \item{category}{The category of the principal crime - one of `ourse of conduct` (which includes stalking, harrassment and threats to kill), `Theft / CD` and `Violent/Sexual`}
+#'   \item{victim_age}{The age of the victim in years}
+#'   \item{suspect_age}{The age of the suspect in years}
+#'   \item{sus_age_bin}{A binned version of `suspect_age`}
+#'   \item{nprev_sus}{The number of intimate partner abuse incidents committed by the suspect in the previous 12 months}
+#'   \item{nprev_sus_bin}{A binned verion of `nprev_sus`}
 #' }
-"eg_data"
+"fm_data"

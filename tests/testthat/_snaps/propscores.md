@@ -163,9 +163,9 @@
 # List, expected N of 300
 
     Code
-      propscores(df = eg_data, cov_cols = c("risk_ass", "category", "sus_age_bin"),
-      arm_col = "Arm", intervention_level = "Intervention", cov_dist = list(c(
-        "risk_ass", "category")), pz1_fn = pz1_expectedN(300))
+      propscores(df = fm_data, cov_cols = c("risk_ass", "category", "sus_age_bin"),
+      arm_col = "FM_equip", intervention_level = TRUE, cov_dist = list(c("risk_ass",
+        "category")), pz1_fn = pz1_expectedN(300))
     Message
       There are 1 NA values in the category column. These rows will be lost.
       There are 1 NA values in the sus_age_bin column. These rows will be lost.
@@ -250,7 +250,7 @@
 # More covs (some 00), FM_equip
 
     Code
-      propscores(df = eg_data, cov_cols = c("risk_ass", "category", "sus_age_bin",
+      propscores(df = fm_data, cov_cols = c("risk_ass", "category", "sus_age_bin",
         "nprev_sus_bin"), arm_col = "FM_equip", intervention_level = T, cov_dist = "joint",
       pz1_fn = pz1_expectedN(300))
     Message
@@ -554,9 +554,9 @@
 # Char, Joint, rescale to 1.5
 
     Code
-      propscores(df = eg_data_char, cov_cols = c("risk_ass", "category",
-        "sus_age_bin"), arm_col = "Arm", intervention_level = "Intervention",
-      cov_dist = "joint", pz1_fn = pz1_rescale(1))
+      propscores(df = fm_data_char, cov_cols = c("risk_ass", "category",
+        "sus_age_bin"), arm_col = "FM_equip", intervention_level = TRUE, cov_dist = "joint",
+      pz1_fn = pz1_rescale(1))
     Message
       Column risk_ass has been coerced to a factor with 2 levels
       There are 1 NA values in the category column. These rows will be lost.
@@ -643,9 +643,9 @@
 # Char, Marginal, estimate of 0.01
 
     Code
-      propscores(df = eg_data_char, cov_cols = c("risk_ass", "category",
-        "sus_age_bin"), arm_col = "Arm", intervention_level = "Intervention",
-      cov_dist = "marginal", pz1_fn = pz1_estimate(0.01))
+      propscores(df = fm_data_char, cov_cols = c("risk_ass", "category",
+        "sus_age_bin"), arm_col = "FM_equip", intervention_level = TRUE, cov_dist = "marginal",
+      pz1_fn = pz1_estimate(0.01))
     Message
       Column risk_ass has been coerced to a factor with 2 levels
       There are 1 NA values in the category column. These rows will be lost.
@@ -732,9 +732,9 @@
 # Char, List, expected N of 300
 
     Code
-      propscores(df = eg_data_char, cov_cols = c("risk_ass", "category",
-        "sus_age_bin"), arm_col = "Arm", intervention_level = "Intervention",
-      cov_dist = list(c("risk_ass", "category")), pz1_fn = pz1_expectedN(300))
+      propscores(df = fm_data_char, cov_cols = c("risk_ass", "category",
+        "sus_age_bin"), arm_col = "FM_equip", intervention_level = TRUE, cov_dist = list(
+        c("risk_ass", "category")), pz1_fn = pz1_expectedN(300))
     Message
       Column risk_ass has been coerced to a factor with 2 levels
       There are 1 NA values in the category column. These rows will be lost.

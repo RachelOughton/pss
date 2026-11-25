@@ -19,7 +19,7 @@ pss_check_data(df, cov_cols, arm_col, intervention_level)
 \code{pss_check_data} returns a (possibly slightly tidied up) data frame or an error message. The data frame will have an \code{Arm} column with levels \code{Intervention} and \code{Comparison}.
 }
 \description{
-\code{pss_check_data} checks that the data frame provided is suitable. Will return either a very slightly cleaned up version, or an error message.
+\code{\link[=pss_check_data]{pss_check_data()}} checks that the data frame provided is suitable. Will return either a very slightly cleaned up version, or an error message. \code{\link[=pss_check_data]{pss_check_data()}} is called by several other functions in \code{pss} but should not need to be called by the user.
 The function does the following:
 \itemize{
 \item checks the \code{arm_col} column has two unique values, one of which is \code{intervention_level}
@@ -30,9 +30,10 @@ The function does the following:
 }
 \examples{
 pss_check_data(
-  df = eg_data,
+  df = fm_data,
   cov_cols = c("risk_ass", "category", "sus_age_bin"),
-  arm_col = "Arm",
-  intervention_level = "Intervention"
+  arm_col = "FM_equip",
+  intervention_level = TRUE
 )
 }
+\keyword{internal}

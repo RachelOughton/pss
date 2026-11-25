@@ -1,6 +1,6 @@
 #' Bin numeric columns
 #'
-#' These two functions add binned versions of a numerical column to a data frame. [quantile_bin()] forms the bins using the quantiles of the numerical variables, whereas [breaks_bin()] uses breaks determined by the user. In either case, the intervals are closed at the lower end and open at the top end, so for example the bin "2 to 3" would contain values of 2, but not of 3. [quantile_bin()] can operate on multiple numerical columns, whereas [breaks_bin()] can only work on one column.
+#' These two functions add binned versions of a numerical column to a data frame, which can be necessary before running [propscores()]. [quantile_bin()] forms the bins using the quantiles of the numerical variables, whereas [breaks_bin()] uses breaks determined by the user. In either case, the intervals are closed at the lower end and open at the top end, so for example the bin "2 to 3" would contain values of 2, but not of 3. [quantile_bin()] can operate on multiple numerical columns, whereas [breaks_bin()] can only work on one column.
 #'
 #' @name quantile_bin
 #' @param df A data frame containing treatment group and comparison cohort data
@@ -18,7 +18,7 @@
 #' ## Create three bins for each, and round the breaks to zero digits (default)
 #'
 #' df_bin = quantile_bin(
-#'   df = eg_data,
+#'   df = fm_data,
 #'   cols = c("victim_age", "suspect_age"),
 #'   nbins = 3
 #'   )
@@ -42,7 +42,7 @@
 #' ## Create binned column for `nprev_sus`
 #'
 #' df_bin2 = breaks_bin(
-#'   df = eg_data,
+#'   df = fm_data,
 #'   col = "nprev_sus",
 #'   breaks = c(1, 2),
 #'   labels = c("Zero", "One", "Two plus")

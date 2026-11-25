@@ -1,4 +1,6 @@
-#' Display the treatment cases that will be dropped under a particular matched sample
+#' Tabulate dropped treatment cases for a particular matched sample
+#'
+#' [dropped_cases()] summarises the treated cases that are dropped for a particular matched sample, showing counts for each combination of covariates. Treated cases will only be dropped if `sampling = "downsample"` and/or `drop_int = TRUE`.
 #'
 #' @name dropped_cases
 #' @param matched_df A data frame output by [matched_sample()]. This should contain columns for `arm_col`, all elements of `cov_cols` and `include`. It must have the `Arm` column with levels `"Intervention"` and `"Comparison"`. It may also contain other columns.
@@ -18,10 +20,10 @@
 #' ## that the expected size of the comparison group is 300
 #'
 #' eg_j_exp300 <- propscores(
-#'   df = eg_data,
+#'   df = fm_data,
 #'   cov_cols = c("risk_ass", "category", "sus_age_bin"),
-#'   arm_col = "Arm",
-#'   intervention_level = "Intervention",
+#'   arm_col = "FM_equip",
+#'   intervention_level = TRUE,
 #'   cov_dist = "joint",
 #'   pz1_fn = pz1_expectedN(300)
 #' )
@@ -31,19 +33,19 @@
 #' ## and do not drop any intervention cases for which there are no
 #' ## comparison cases to sample
 #'
-#' match_j_exp300_replace <- matched_sample(
-#'   df = eg_data,
+#' match_j_exp300 <- matched_sample(
+#'   df = fm_data,
 #'   propscores = eg_j_exp300,
 #'   seed = 20,
 #'   sampling = "downsample",
-#'   drop_int = FALSE
+#'   drop_int = TRUE
 #' )
 #'
 #' ## Finally we use [dropped_cases()] to summarise the treated / intervention
 #' ## cases that have been dropped or downsampled
 #' ## included `include` times
 #'
-#' match_j_exp300_replace |> dropped_cases()
+#' match_j_exp300 |> dropped_cases()
 #'
 #' @importFrom rlang .data
 

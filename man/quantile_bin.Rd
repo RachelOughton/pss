@@ -30,7 +30,7 @@ breaks_bin(df, col, breaks, labels = NULL)
 \code{\link[=breaks_bin]{breaks_bin()}} adds a binned version of a numerical column to a dataframe, using specified breaks. Labels can be supplied, or can be automatically formed.
 }
 \description{
-These two functions add binned versions of a numerical column to a data frame. \code{\link[=quantile_bin]{quantile_bin()}} forms the bins using the quantiles of the numerical variables, whereas \code{\link[=breaks_bin]{breaks_bin()}} uses breaks determined by the user. In either case, the intervals are closed at the lower end and open at the top end, so for example the bin "2 to 3" would contain values of 2, but not of 3. \code{\link[=quantile_bin]{quantile_bin()}} can operate on multiple numerical columns, whereas \code{\link[=breaks_bin]{breaks_bin()}} can only work on one column.
+These two functions add binned versions of a numerical column to a data frame, which can be necessary before running \code{\link[=propscores]{propscores()}}. \code{\link[=quantile_bin]{quantile_bin()}} forms the bins using the quantiles of the numerical variables, whereas \code{\link[=breaks_bin]{breaks_bin()}} uses breaks determined by the user. In either case, the intervals are closed at the lower end and open at the top end, so for example the bin "2 to 3" would contain values of 2, but not of 3. \code{\link[=quantile_bin]{quantile_bin()}} can operate on multiple numerical columns, whereas \code{\link[=breaks_bin]{breaks_bin()}} can only work on one column.
 }
 \section{Functions}{
 \itemize{
@@ -42,7 +42,7 @@ These two functions add binned versions of a numerical column to a data frame. \
 ## Create three bins for each, and round the breaks to zero digits (default)
 
 df_bin = quantile_bin(
-  df = eg_data,
+  df = fm_data,
   cols = c("victim_age", "suspect_age"),
   nbins = 3
   )
@@ -66,7 +66,7 @@ df_bin |>
 ## Create binned column for `nprev_sus`
 
 df_bin2 = breaks_bin(
-  df = eg_data,
+  df = fm_data,
   col = "nprev_sus",
   breaks = c(1, 2),
   labels = c("Zero", "One", "Two plus")

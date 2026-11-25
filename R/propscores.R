@@ -29,46 +29,46 @@
 #' - Some further columns, depending on which method is used
 #'
 #' The data frame is assigned attributes `cov_cols`, `arm_col` and `intervention_level`, storing the information for use in subsequent functions such as [matched_sample()] (if `use_attr` is set to `TRUE`).
-
+#' @seealso [quantile_bin()], [breaks_bin()]
 
 #' @export
 #'
 #' @examples
-#' # Creates a propensity score data frame from `eg_data`
+#' # Creates a propensity score data frame from `fm_data`
 #' # using the joint approach, and rescaling so that the
 #' # highest propensity score is 1.
 #' propscores(
-#'   df = eg_data,
+#'   df = fm_data,
 #'   cov_cols = c("risk_ass", "category", "sus_age_bin"),
-#'   arm_col = "Arm",
-#'   intervention_level = "Intervention",
+#'   arm_col = "FM_equip",
+#'   intervention_level = TRUE,
 #'   cov_dist = "joint",
 #'   pz1_fn = pz1_rescale(1)
 #' )
 #'
-#' # Creates a propensity score data frame from `eg_data`
+#' # Creates a propensity score data frame from `fm_data`
 #' # using the fully marginal approach, and setting p(Z=1)
 #' # so that the expected size of the matched comparison
 #' # group will be 300
 #' propscores(
-#'   df = eg_data,
+#'   df = fm_data,
 #'   cov_cols = c("risk_ass", "category", "sus_age_bin"),
-#'   arm_col = "Arm",
-#'   intervention_level = "Intervention",
+#'   arm_col = "FM_equip",
+#'   intervention_level = TRUE,
 #'   cov_dist = "marginal",
 #'   pz1_fn = pz1_expectedN(300)
 #' )
 #'
-#' # Creates a propensity score data frame from `eg_data`
+#' # Creates a propensity score data frame from `fm_data`
 #' # for which "risk_ass" and "category" are considered
 #' # jointly and "sus_age_bin" marginally, and setting p(Z=1)
 #' # so that the expected size of the matched comparison
 #' # group will be 300
 #' propscores(
-#'   df = eg_data,
+#'   df = fm_data,
 #'   cov_cols = c("risk_ass", "category", "sus_age_bin"),
-#'   arm_col = "Arm",
-#'   intervention_level = "Intervention",
+#'   arm_col = "FM_equip",
+#'   intervention_level = TRUE,
 #'   cov_dist = "marginal",
 #'   pz1_fn = pz1_expectedN(300)
 #' )

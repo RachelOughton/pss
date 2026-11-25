@@ -1,7 +1,7 @@
 ## Working for dropped cases and repeat cases
 
 eg_j_exp300 <- propscores(
- df = eg_data,
+ df = fm_data,
    cov_cols = c("risk_ass", "category", "sus_age_bin"),
    arm_col = "Arm",
    intervention_level = "Intervention",
@@ -10,7 +10,7 @@ eg_j_exp300 <- propscores(
 )
 
 match_j_exp300_rep <- matched_sample(
-   df = eg_data,
+   df = fm_data,
    propscores = eg_j_exp300,
    seed = 20,
    sampling = "repeat",
@@ -18,7 +18,7 @@ match_j_exp300_rep <- matched_sample(
 )
 
 match_j_exp300_down <- matched_sample(
-  df = eg_data,
+  df = fm_data,
   propscores = eg_j_exp300,
   seed = 20,
   sampling = "downsample",

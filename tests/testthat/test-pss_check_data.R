@@ -3,20 +3,20 @@
 # Giving numerical argument
 expect_error(
   pss_check_data(
-    df = eg_data,
+    df = fm_data,
     cov_cols = c("risk_ass", "category", "suspect_age"),
-    arm_col = "Arm",
-    intervention_level = "Intervention"
+    arm_col = "FM_equip",
+    intervention_level = TRUE
     )
   )
 
 # Giving a cov col name that isn't in the dataset
 expect_error(
   pss_check_data(
-    df = eg_data,
+    df = fm_data,
     cov_cols = c("risk_ass", "category1", "sus_age_bin"),
-    arm_col = "Arm",
-    intervention_level = "Intervention",
+    arm_col = "FM_equip",
+    intervention_level = TRUE,
     cov_dist = props_joint_fn()
   )
 )
@@ -24,10 +24,10 @@ expect_error(
 test_that("my output looks right", {
   expect_snapshot(
     pss_check_data(
-      df = eg_data,
+      df = fm_data,
       cov_cols = c("risk_ass", "category", "sus_age_bin"),
-      arm_col = "Arm",
-      intervention_level = "Intervention"
+      arm_col = "FM_equip",
+      intervention_level = TRUE
     )
   )})
 

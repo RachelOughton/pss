@@ -1,7 +1,7 @@
 ## Working for candidates
 
 candidates(
-  df = eg_data,
+  df = fm_data,
   propscores = eg_j_est1,
   seeds = 1:10,
   smd_cols = c("suspect_age", "category", "risk_ass", "sus_age_bin"),
@@ -10,7 +10,7 @@ candidates(
 )
 
 candidates(
-  df = eg_data,
+  df = fm_data,
   propscores = eg_j_est1,
   seeds = 1:10,
   smd_cols = c("suspect_age", "category", "risk_ass", "sus_age_bin"),
@@ -19,7 +19,7 @@ candidates(
 )
 
 candidates(
-  df = eg_data,
+  df = fm_data,
   propscores = eg_j_est1,
   seeds = 1:10,
   smd_cols = c("suspect_age", "category", "risk_ass", "sus_age_bin"),
@@ -28,7 +28,7 @@ candidates(
 )
 
 stdf= candidates(
-  df = eg_data,
+  df = fm_data,
   propscores = eg_j_est1,
   seeds = 1:10,
   smd_cols = c("suspect_age", "category", "risk_ass", "sus_age_bin"),
@@ -39,7 +39,7 @@ stdf= candidates(
 ## Recreating failed test
 
 eg_j_est015 = propscores(
-  df = eg_data,
+  df = fm_data,
   cov_cols = c("risk_ass", "category", "sus_age_bin"),
   arm_col = "Arm",
   intervention_level = "Intervention",
@@ -49,7 +49,7 @@ eg_j_est015 = propscores(
 
 
 candidates(
-  df = eg_data,
+  df = fm_data,
   propscores = eg_j_est015,
   seeds = 3*(1:10),
   smd_cols = c("risk_ass", "category", "sus_age_bin"),
@@ -59,7 +59,7 @@ candidates(
 ## Including a continuous cov
 
 candidates(
-  df = eg_data,
+  df = fm_data,
   propscores = eg_j_est015,
   seeds = 3*(1:10),
   smd_cols = c("risk_ass", "category", "suspect_age"),

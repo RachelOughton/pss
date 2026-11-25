@@ -1,187 +1,181 @@
 # With replacement, not dropping
 
     Code
-      matched_sample(df = eg_data, propscores = eg_mix_exp100, cov_cols = c(
-        "category", "risk_ass", "sus_age_bin"), arm_col = "Arm", use_attr = F,
-      intervention_level = "Intervention", seed = 20, sampling = "repeat", drop_int = F)
+      matched_sample(df = fm_data, propscores = eg_mix_exp100, cov_cols = c(
+        "category", "risk_ass", "sus_age_bin"), arm_col = "FM_equip", use_attr = F,
+      intervention_level = TRUE, seed = 20, sampling = "repeat", drop_int = F)
     Message
       There are 1 NA values in the category column. These rows will be lost.
       There are 1 NA values in the sus_age_bin column. These rows will be lost.
     Output
-      # A tibble: 997 x 34
-         victim_sex victim_age suspect_sex suspect_age reference_date      FM_equip
-       * <chr>           <dbl> <chr>             <dbl> <dttm>              <lgl>   
-       1 F                  28 M                    35 2024-12-06 16:13:16 TRUE    
-       2 F                  28 M                    35 2024-12-06 16:13:16 TRUE    
-       3 F                  28 M                    35 2024-12-06 16:13:16 TRUE    
-       4 F                  35 M                    35 2024-12-02 18:50:41 TRUE    
-       5 F                  34 M                    37 2024-06-24 05:03:50 TRUE    
-       6 F                  51 M                    54 2024-07-21 15:34:52 TRUE    
-       7 F                  60 M                    41 2024-08-03 00:52:16 TRUE    
-       8 F                  39 M                    23 2024-07-04 10:43:38 TRUE    
-       9 F                  31 M                    28 2024-07-29 21:11:28 TRUE    
-      10 F                  34 M                    36 2024-08-03 10:19:20 TRUE    
+      # A tibble: 997 x 22
+         FM_equip risk_ass category       victim_age suspect_age sus_age_bin nprev_sus
+       * <lgl>    <fct>    <fct>               <dbl>       <dbl> <fct>           <dbl>
+       1 TRUE     MEDIUM   Violent/Sexual         28          35 33-39               0
+       2 TRUE     MEDIUM   Violent/Sexual         28          35 33-39               0
+       3 TRUE     MEDIUM   Violent/Sexual         28          35 33-39               0
+       4 TRUE     HIGH     Violent/Sexual         35          35 33-39               3
+       5 TRUE     HIGH     Violent/Sexual         34          37 33-39               0
+       6 TRUE     MEDIUM   Course of con~         51          54 40+                 0
+       7 TRUE     HIGH     Course of con~         60          41 40+                 1
+       8 TRUE     HIGH     Course of con~         39          23 Under 29            1
+       9 TRUE     HIGH     Violent/Sexual         31          28 Under 29            1
+      10 TRUE     HIGH     Violent/Sexual         34          36 33-39               1
       # i 987 more rows
-      # i 28 more variables: warning_YN <chr>, risk_ass <fct>,
-      #   protection_order <lgl>, princ_crime <chr>, category_new <fct>, phase <dbl>,
-      #   nprev_sus <dbl>, n_fo_sus <int>, n_fo_dyad <lgl>, susprev_stalking <lgl>,
-      #   susprev_vs_high <lgl>, Arm <chr>, category <fct>, sus_age_bin <fct>,
-      #   nprev_sus_bin <fct>, arm_given <tibble[,1]>, include <dbl>,
-      #   p_int_risk_ass.category <dbl>, p_comp_risk_ass.category <dbl>, ...
+      # i 15 more variables: nprev_sus_bin <fct>, arm_given <tibble[,1]>, Arm <chr>,
+      #   include <dbl>, p_int_risk_ass.category <dbl>,
+      #   p_comp_risk_ass.category <dbl>, p_int_sus_age_bin <dbl>,
+      #   p_comp_sus_age_bin <dbl>, px_int <dbl>, px_comp <dbl>, ratio <dbl>,
+      #   count_comp <int>, count_int <int>, PropScore <dbl>, seed <dbl>
 
 ---
 
     Code
-      matched_sample(df = eg_data, propscores = eg_m_resc15, cov_cols = c("category",
-        "risk_ass", "sus_age_bin"), arm_col = "Arm", use_attr = F,
-      intervention_level = "Intervention", seed = 20, sampling = "repeat", drop_int = F)
+      matched_sample(df = fm_data, propscores = eg_m_resc15, cov_cols = c("category",
+        "risk_ass", "sus_age_bin"), arm_col = "FM_equip", use_attr = F,
+      intervention_level = TRUE, seed = 20, sampling = "repeat", drop_int = F)
     Message
       There are 1 NA values in the category column. These rows will be lost.
       There are 1 NA values in the sus_age_bin column. These rows will be lost.
       47 comparison cases are being repeated 2 times
     Output
-      # A tibble: 997 x 36
-         victim_sex victim_age suspect_sex suspect_age reference_date      FM_equip
-       * <chr>           <dbl> <chr>             <dbl> <dttm>              <lgl>   
-       1 F                  28 M                    35 2024-12-06 16:13:16 TRUE    
-       2 F                  28 M                    35 2024-12-06 16:13:16 TRUE    
-       3 F                  28 M                    35 2024-12-06 16:13:16 TRUE    
-       4 F                  35 M                    35 2024-12-02 18:50:41 TRUE    
-       5 F                  34 M                    37 2024-06-24 05:03:50 TRUE    
-       6 F                  51 M                    54 2024-07-21 15:34:52 TRUE    
-       7 F                  60 M                    41 2024-08-03 00:52:16 TRUE    
-       8 F                  39 M                    23 2024-07-04 10:43:38 TRUE    
-       9 F                  31 M                    28 2024-07-29 21:11:28 TRUE    
-      10 F                  34 M                    36 2024-08-03 10:19:20 TRUE    
+      # A tibble: 997 x 24
+         FM_equip risk_ass category       victim_age suspect_age sus_age_bin nprev_sus
+       * <lgl>    <fct>    <fct>               <dbl>       <dbl> <fct>           <dbl>
+       1 TRUE     MEDIUM   Violent/Sexual         28          35 33-39               0
+       2 TRUE     MEDIUM   Violent/Sexual         28          35 33-39               0
+       3 TRUE     MEDIUM   Violent/Sexual         28          35 33-39               0
+       4 TRUE     HIGH     Violent/Sexual         35          35 33-39               3
+       5 TRUE     HIGH     Violent/Sexual         34          37 33-39               0
+       6 TRUE     MEDIUM   Course of con~         51          54 40+                 0
+       7 TRUE     HIGH     Course of con~         60          41 40+                 1
+       8 TRUE     HIGH     Course of con~         39          23 Under 29            1
+       9 TRUE     HIGH     Violent/Sexual         31          28 Under 29            1
+      10 TRUE     HIGH     Violent/Sexual         34          36 33-39               1
       # i 987 more rows
-      # i 30 more variables: warning_YN <chr>, risk_ass <fct>,
-      #   protection_order <lgl>, princ_crime <chr>, category_new <fct>, phase <dbl>,
-      #   nprev_sus <dbl>, n_fo_sus <int>, n_fo_dyad <lgl>, susprev_stalking <lgl>,
-      #   susprev_vs_high <lgl>, Arm <chr>, category <fct>, sus_age_bin <fct>,
-      #   nprev_sus_bin <fct>, arm_given <tibble[,1]>, include <dbl>,
-      #   p_int_risk_ass <dbl>, p_comp_risk_ass <dbl>, p_int_category <dbl>, ...
+      # i 17 more variables: nprev_sus_bin <fct>, arm_given <tibble[,1]>, Arm <chr>,
+      #   include <dbl>, p_int_risk_ass <dbl>, p_comp_risk_ass <dbl>,
+      #   p_int_category <dbl>, p_comp_category <dbl>, p_int_sus_age_bin <dbl>,
+      #   p_comp_sus_age_bin <dbl>, px_int <dbl>, px_comp <dbl>, ratio <dbl>,
+      #   count_comp <int>, count_int <int>, PropScore <dbl>, seed <dbl>
 
 ---
 
     Code
-      matched_sample(df = eg_data, propscores = eg_m_resc15, seed = 20, sampling = "repeat",
+      matched_sample(df = fm_data, propscores = eg_m_resc15, seed = 20, sampling = "repeat",
         drop_int = F)
     Message
       There are 1 NA values in the category column. These rows will be lost.
       There are 1 NA values in the sus_age_bin column. These rows will be lost.
       47 comparison cases are being repeated 2 times
     Output
-      # A tibble: 997 x 36
-         victim_sex victim_age suspect_sex suspect_age reference_date      FM_equip
-       * <chr>           <dbl> <chr>             <dbl> <dttm>              <lgl>   
-       1 F                  28 M                    35 2024-12-06 16:13:16 TRUE    
-       2 F                  28 M                    35 2024-12-06 16:13:16 TRUE    
-       3 F                  28 M                    35 2024-12-06 16:13:16 TRUE    
-       4 F                  35 M                    35 2024-12-02 18:50:41 TRUE    
-       5 F                  34 M                    37 2024-06-24 05:03:50 TRUE    
-       6 F                  51 M                    54 2024-07-21 15:34:52 TRUE    
-       7 F                  60 M                    41 2024-08-03 00:52:16 TRUE    
-       8 F                  39 M                    23 2024-07-04 10:43:38 TRUE    
-       9 F                  31 M                    28 2024-07-29 21:11:28 TRUE    
-      10 F                  34 M                    36 2024-08-03 10:19:20 TRUE    
+      # A tibble: 997 x 24
+         FM_equip risk_ass category       victim_age suspect_age sus_age_bin nprev_sus
+       * <lgl>    <fct>    <fct>               <dbl>       <dbl> <fct>           <dbl>
+       1 TRUE     MEDIUM   Violent/Sexual         28          35 33-39               0
+       2 TRUE     MEDIUM   Violent/Sexual         28          35 33-39               0
+       3 TRUE     MEDIUM   Violent/Sexual         28          35 33-39               0
+       4 TRUE     HIGH     Violent/Sexual         35          35 33-39               3
+       5 TRUE     HIGH     Violent/Sexual         34          37 33-39               0
+       6 TRUE     MEDIUM   Course of con~         51          54 40+                 0
+       7 TRUE     HIGH     Course of con~         60          41 40+                 1
+       8 TRUE     HIGH     Course of con~         39          23 Under 29            1
+       9 TRUE     HIGH     Violent/Sexual         31          28 Under 29            1
+      10 TRUE     HIGH     Violent/Sexual         34          36 33-39               1
       # i 987 more rows
-      # i 30 more variables: warning_YN <chr>, risk_ass <fct>,
-      #   protection_order <lgl>, princ_crime <chr>, category_new <fct>, phase <dbl>,
-      #   nprev_sus <dbl>, n_fo_sus <int>, n_fo_dyad <lgl>, susprev_stalking <lgl>,
-      #   susprev_vs_high <lgl>, Arm <chr>, category <fct>, sus_age_bin <fct>,
-      #   nprev_sus_bin <fct>, arm_given <tibble[,1]>, include <dbl>,
-      #   p_int_risk_ass <dbl>, p_comp_risk_ass <dbl>, p_int_category <dbl>, ...
+      # i 17 more variables: nprev_sus_bin <fct>, arm_given <tibble[,1]>, Arm <chr>,
+      #   include <dbl>, p_int_risk_ass <dbl>, p_comp_risk_ass <dbl>,
+      #   p_int_category <dbl>, p_comp_category <dbl>, p_int_sus_age_bin <dbl>,
+      #   p_comp_sus_age_bin <dbl>, px_int <dbl>, px_comp <dbl>, ratio <dbl>,
+      #   count_comp <int>, count_int <int>, PropScore <dbl>, seed <dbl>
 
 # downsampling, dropping
 
     Code
-      matched_sample(df = eg_data, propscores = eg_m_resc15, cov_cols = c("category",
-        "risk_ass", "sus_age_bin"), arm_col = "Arm", intervention_level = "Intervention",
+      matched_sample(df = fm_data, propscores = eg_m_resc15, cov_cols = c("category",
+        "risk_ass", "sus_age_bin"), arm_col = "FM_equip", intervention_level = TRUE,
       use_attr = F, seed = 20, sampling = "downsample", drop_int = T)
     Message
       There are 1 NA values in the category column. These rows will be lost.
       There are 1 NA values in the sus_age_bin column. These rows will be lost.
       27 intervention cases have beeen downsampled
     Output
-      # A tibble: 997 x 36
-         victim_sex victim_age suspect_sex suspect_age reference_date      FM_equip
-       * <chr>           <dbl> <chr>             <dbl> <dttm>              <lgl>   
-       1 F                  28 M                    35 2024-12-06 16:13:16 TRUE    
-       2 F                  28 M                    35 2024-12-06 16:13:16 TRUE    
-       3 F                  28 M                    35 2024-12-06 16:13:16 TRUE    
-       4 F                  35 M                    35 2024-12-02 18:50:41 TRUE    
-       5 F                  34 M                    37 2024-06-24 05:03:50 TRUE    
-       6 F                  51 M                    54 2024-07-21 15:34:52 TRUE    
-       7 F                  60 M                    41 2024-08-03 00:52:16 TRUE    
-       8 F                  39 M                    23 2024-07-04 10:43:38 TRUE    
-       9 F                  31 M                    28 2024-07-29 21:11:28 TRUE    
-      10 F                  34 M                    36 2024-08-03 10:19:20 TRUE    
+      # A tibble: 997 x 24
+         FM_equip risk_ass category       victim_age suspect_age sus_age_bin nprev_sus
+       * <lgl>    <fct>    <fct>               <dbl>       <dbl> <fct>           <dbl>
+       1 TRUE     MEDIUM   Violent/Sexual         28          35 33-39               0
+       2 TRUE     MEDIUM   Violent/Sexual         28          35 33-39               0
+       3 TRUE     MEDIUM   Violent/Sexual         28          35 33-39               0
+       4 TRUE     HIGH     Violent/Sexual         35          35 33-39               3
+       5 TRUE     HIGH     Violent/Sexual         34          37 33-39               0
+       6 TRUE     MEDIUM   Course of con~         51          54 40+                 0
+       7 TRUE     HIGH     Course of con~         60          41 40+                 1
+       8 TRUE     HIGH     Course of con~         39          23 Under 29            1
+       9 TRUE     HIGH     Violent/Sexual         31          28 Under 29            1
+      10 TRUE     HIGH     Violent/Sexual         34          36 33-39               1
       # i 987 more rows
-      # i 30 more variables: warning_YN <chr>, risk_ass <fct>,
-      #   protection_order <lgl>, princ_crime <chr>, category_new <fct>, phase <dbl>,
-      #   nprev_sus <dbl>, n_fo_sus <int>, n_fo_dyad <lgl>, susprev_stalking <lgl>,
-      #   susprev_vs_high <lgl>, Arm <chr>, category <fct>, sus_age_bin <fct>,
-      #   nprev_sus_bin <fct>, arm_given <tibble[,1]>, include <dbl>,
-      #   p_int_risk_ass <dbl>, p_comp_risk_ass <dbl>, p_int_category <dbl>, ...
+      # i 17 more variables: nprev_sus_bin <fct>, arm_given <tibble[,1]>, Arm <chr>,
+      #   include <dbl>, p_int_risk_ass <dbl>, p_comp_risk_ass <dbl>,
+      #   p_int_category <dbl>, p_comp_category <dbl>, p_int_sus_age_bin <dbl>,
+      #   p_comp_sus_age_bin <dbl>, px_int <dbl>, px_comp <dbl>, ratio <dbl>,
+      #   count_comp <int>, count_int <int>, PropScore <dbl>, seed <dbl>
 
 ---
 
     Code
-      matched_sample(df = eg_data, propscores = eg_m_resc15, seed = 20, sampling = "downsample",
+      matched_sample(df = fm_data, propscores = eg_m_resc15, seed = 20, sampling = "downsample",
         drop_int = T)
     Message
       There are 1 NA values in the category column. These rows will be lost.
       There are 1 NA values in the sus_age_bin column. These rows will be lost.
       27 intervention cases have beeen downsampled
     Output
-      # A tibble: 997 x 36
-         victim_sex victim_age suspect_sex suspect_age reference_date      FM_equip
-       * <chr>           <dbl> <chr>             <dbl> <dttm>              <lgl>   
-       1 F                  28 M                    35 2024-12-06 16:13:16 TRUE    
-       2 F                  28 M                    35 2024-12-06 16:13:16 TRUE    
-       3 F                  28 M                    35 2024-12-06 16:13:16 TRUE    
-       4 F                  35 M                    35 2024-12-02 18:50:41 TRUE    
-       5 F                  34 M                    37 2024-06-24 05:03:50 TRUE    
-       6 F                  51 M                    54 2024-07-21 15:34:52 TRUE    
-       7 F                  60 M                    41 2024-08-03 00:52:16 TRUE    
-       8 F                  39 M                    23 2024-07-04 10:43:38 TRUE    
-       9 F                  31 M                    28 2024-07-29 21:11:28 TRUE    
-      10 F                  34 M                    36 2024-08-03 10:19:20 TRUE    
+      # A tibble: 997 x 24
+         FM_equip risk_ass category       victim_age suspect_age sus_age_bin nprev_sus
+       * <lgl>    <fct>    <fct>               <dbl>       <dbl> <fct>           <dbl>
+       1 TRUE     MEDIUM   Violent/Sexual         28          35 33-39               0
+       2 TRUE     MEDIUM   Violent/Sexual         28          35 33-39               0
+       3 TRUE     MEDIUM   Violent/Sexual         28          35 33-39               0
+       4 TRUE     HIGH     Violent/Sexual         35          35 33-39               3
+       5 TRUE     HIGH     Violent/Sexual         34          37 33-39               0
+       6 TRUE     MEDIUM   Course of con~         51          54 40+                 0
+       7 TRUE     HIGH     Course of con~         60          41 40+                 1
+       8 TRUE     HIGH     Course of con~         39          23 Under 29            1
+       9 TRUE     HIGH     Violent/Sexual         31          28 Under 29            1
+      10 TRUE     HIGH     Violent/Sexual         34          36 33-39               1
       # i 987 more rows
-      # i 30 more variables: warning_YN <chr>, risk_ass <fct>,
-      #   protection_order <lgl>, princ_crime <chr>, category_new <fct>, phase <dbl>,
-      #   nprev_sus <dbl>, n_fo_sus <int>, n_fo_dyad <lgl>, susprev_stalking <lgl>,
-      #   susprev_vs_high <lgl>, Arm <chr>, category <fct>, sus_age_bin <fct>,
-      #   nprev_sus_bin <fct>, arm_given <tibble[,1]>, include <dbl>,
-      #   p_int_risk_ass <dbl>, p_comp_risk_ass <dbl>, p_int_category <dbl>, ...
+      # i 17 more variables: nprev_sus_bin <fct>, arm_given <tibble[,1]>, Arm <chr>,
+      #   include <dbl>, p_int_risk_ass <dbl>, p_comp_risk_ass <dbl>,
+      #   p_int_category <dbl>, p_comp_category <dbl>, p_int_sus_age_bin <dbl>,
+      #   p_comp_sus_age_bin <dbl>, px_int <dbl>, px_comp <dbl>, ratio <dbl>,
+      #   count_comp <int>, count_int <int>, PropScore <dbl>, seed <dbl>
 
 # With replacement, not dropping. Upper case repeat
 
     Code
-      matched_sample(df = eg_data, propscores = eg_mix_exp100, seed = 20, sampling = "RepEat",
+      matched_sample(df = fm_data, propscores = eg_mix_exp100, seed = 20, sampling = "RepEat",
         drop_int = F)
     Message
       There are 1 NA values in the category column. These rows will be lost.
       There are 1 NA values in the sus_age_bin column. These rows will be lost.
     Output
-      # A tibble: 997 x 34
-         victim_sex victim_age suspect_sex suspect_age reference_date      FM_equip
-       * <chr>           <dbl> <chr>             <dbl> <dttm>              <lgl>   
-       1 F                  28 M                    35 2024-12-06 16:13:16 TRUE    
-       2 F                  28 M                    35 2024-12-06 16:13:16 TRUE    
-       3 F                  28 M                    35 2024-12-06 16:13:16 TRUE    
-       4 F                  35 M                    35 2024-12-02 18:50:41 TRUE    
-       5 F                  34 M                    37 2024-06-24 05:03:50 TRUE    
-       6 F                  51 M                    54 2024-07-21 15:34:52 TRUE    
-       7 F                  60 M                    41 2024-08-03 00:52:16 TRUE    
-       8 F                  39 M                    23 2024-07-04 10:43:38 TRUE    
-       9 F                  31 M                    28 2024-07-29 21:11:28 TRUE    
-      10 F                  34 M                    36 2024-08-03 10:19:20 TRUE    
+      # A tibble: 997 x 22
+         FM_equip risk_ass category       victim_age suspect_age sus_age_bin nprev_sus
+       * <lgl>    <fct>    <fct>               <dbl>       <dbl> <fct>           <dbl>
+       1 TRUE     MEDIUM   Violent/Sexual         28          35 33-39               0
+       2 TRUE     MEDIUM   Violent/Sexual         28          35 33-39               0
+       3 TRUE     MEDIUM   Violent/Sexual         28          35 33-39               0
+       4 TRUE     HIGH     Violent/Sexual         35          35 33-39               3
+       5 TRUE     HIGH     Violent/Sexual         34          37 33-39               0
+       6 TRUE     MEDIUM   Course of con~         51          54 40+                 0
+       7 TRUE     HIGH     Course of con~         60          41 40+                 1
+       8 TRUE     HIGH     Course of con~         39          23 Under 29            1
+       9 TRUE     HIGH     Violent/Sexual         31          28 Under 29            1
+      10 TRUE     HIGH     Violent/Sexual         34          36 33-39               1
       # i 987 more rows
-      # i 28 more variables: warning_YN <chr>, risk_ass <fct>,
-      #   protection_order <lgl>, princ_crime <chr>, category_new <fct>, phase <dbl>,
-      #   nprev_sus <dbl>, n_fo_sus <int>, n_fo_dyad <lgl>, susprev_stalking <lgl>,
-      #   susprev_vs_high <lgl>, Arm <chr>, category <fct>, sus_age_bin <fct>,
-      #   nprev_sus_bin <fct>, arm_given <tibble[,1]>, include <dbl>,
-      #   p_int_risk_ass.category <dbl>, p_comp_risk_ass.category <dbl>, ...
+      # i 15 more variables: nprev_sus_bin <fct>, arm_given <tibble[,1]>, Arm <chr>,
+      #   include <dbl>, p_int_risk_ass.category <dbl>,
+      #   p_comp_risk_ass.category <dbl>, p_int_sus_age_bin <dbl>,
+      #   p_comp_sus_age_bin <dbl>, px_int <dbl>, px_comp <dbl>, ratio <dbl>,
+      #   count_comp <int>, count_int <int>, PropScore <dbl>, seed <dbl>
 
