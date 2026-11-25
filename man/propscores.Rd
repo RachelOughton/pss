@@ -2,15 +2,12 @@
 % Please edit documentation in R/propscores.R
 \name{propscores}
 \alias{propscores}
-\alias{.props_fun}
 \alias{pz1_estimate}
 \alias{pz1_rescale}
 \alias{pz1_expectedN}
 \title{Propensity score data frame}
 \usage{
 propscores(df, cov_cols, arm_col, intervention_level, cov_dist, pz1_fn)
-
-.props_fun(df, cov_cols, cov_list)
 
 pz1_estimate(n_pz1)
 
@@ -31,8 +28,6 @@ pz1_expectedN(n_pz1)
 
 \item{pz1_fn}{One of the functions used to specify p(Z=1): \code{\link[=pz1_rescale]{pz1_rescale()}}, \code{\link[=pz1_estimate]{pz1_estimate()}} or \code{\link[=pz1_expectedN]{pz1_expectedN()}}. Each of these has one numerical argument, \code{n_pz1}, whose meaning depends on the function being used.}
 
-\item{cov_list}{An argument to \verb{[.props_fun()]}. This should be a list of character vectors. The elements of the list determine which groups of covariates are treated jointly. If \code{cov_dist} is "marginal" or "joint" then this is created automatically from \code{cov_cols}. If \code{cov_dist} is a list of groups of covariates to be treated jointly then the covariates to be treated marginally are filled in automatically.}
-
 \item{n_pz1}{An argument to \code{pz1_fn}. Its meaning depends on the function used for \code{pz1_fn}.}
 }
 \value{
@@ -49,8 +44,6 @@ pz1_expectedN(n_pz1)
 
 The data frame is assigned attributes \code{cov_cols}, \code{arm_col} and \code{intervention_level}, storing the information for use in subsequent functions such as \code{\link[=matched_sample]{matched_sample()}} (if \code{use_attr} is set to \code{TRUE}).
 
-\code{\link[=.props_fun]{.props_fun()}} returns a function that creates a data frame containing \code{px_int} (\eqn{p(x|Z=1)} ), \code{px_comp} \eqn{p(x)}{p(x)} and \code{ratio} (\code{px_int / px_comp}) for every combination of the levels of the covariates in \code{cov_cols}, using the approach specified via \code{cov_dist}.
-
 \code{pz1_estimate} returns the estimate of \eqn{p(Z=1)} using the 'estimate' method (eg. a value provided by an expert). The argument is used as the estimate.
 
 \code{pz1_rescale} finds the value of \eqn{p(Z=1)} such that the largest propensity score will be \code{n_pz1} (the argument given to \code{pz1_fn})
@@ -63,13 +56,10 @@ The data frame is assigned attributes \code{cov_cols}, \code{arm_col} and \code{
 
 Of the functions listed, only \code{\link[=propscores]{propscores()}} should be used directly.
 
-\code{\link[=.props_fun]{.props_fun()}} is called by \code{\link[=propscores]{propscores()}}
-to find the proportions of the data within each category for each arm. One of \code{\link[=pz1_estimate]{pz1_estimate()}}, \code{\link[=pz1_rescale]{pz1_rescale()}} or \code{\link[=pz1_expectedN]{pz1_expectedN()}} should be given (with its own argument \code{n_pz1}) as the \code{pz1_fn} argument, to determine which method is used to specify \eqn{p(Z=1)}{p(Z=1)}.
+One of \code{\link[=pz1_estimate]{pz1_estimate()}}, \code{\link[=pz1_rescale]{pz1_rescale()}} or \code{\link[=pz1_expectedN]{pz1_expectedN()}} should be given (with its own argument \code{n_pz1}) as the \code{pz1_fn} argument, to determine which method is used to specify \eqn{p(Z=1)}{p(Z=1)}.
 }
 \section{Functions}{
 \itemize{
-\item \code{.props_fun()}: Find table of estimates of \eqn{p(x)}{p(x)}, \eqn{p(x|Z=1)} and their ratio using fully joint approach
-
 \item \code{pz1_estimate()}: Specify \eqn{p(Z=1)} using the estimate method. The argument given is the estimate used
 
 \item \code{pz1_rescale()}: Specify \eqn{p(Z=1)} using the rescale method. The argument given is the value the largest estimated propensity score should take
