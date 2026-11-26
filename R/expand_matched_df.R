@@ -52,7 +52,7 @@ expand_matched_df <- function(
     stop("There must be an 'include' column, indicating how many times each row should be included.")
   }
   include_vec <- matched_df$include
-  if (!is.numeric(include_vec)) {
+  if ((!is.numeric(include_vec))|(any(include_vec < 0))) {
     stop("The 'include' column must be numeric, and include only non-negative integers.")
   }
   if (anyNA(include_vec) || any(!is.finite(include_vec))) {

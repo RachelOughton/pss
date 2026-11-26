@@ -3,7 +3,7 @@ Title: Propensity Score Sampling for quasi-experimental studies with external co
 Version: 0.0.0.9000
 Authors@R: 
     person("Rachel", "Oughton", , "r.h.oughton@durham.ac.uk", role = c("aut", "cre"))
-Description: IN DEVELOPMENT! Uses propensity score sampling to generate a matched comparison group in a quasi-experimental study where an 'external' comparison cohort is being used. By 'external', we mean a cohort for which the intervention is not available to anyone (for example, a different time or region from the treatment group). Propensity score sampling works by estimating the distribution of combinations of covariates in the treated group (those who have received the treatment / intevention) and the distribution of combinations of covariates in the comparison group (a similar group to whom the intervention / treatment is not available). These estimates are then used to estimate the propensity score, the probability of a person (or case) being given the intervention, conditional on their values of the covariates. The estimated propensity score is used to randomly sample cases so that the resulting dataset is balanced [ref!].
+Description: IN DEVELOPMENT! Performs propensity score sampling to generate a matched comparison group in a quasi-experimental study where an 'external' comparison cohort is being used. By 'external', we mean a cohort for which the intervention is not available to anyone (for example, a different time or region from the treatment group). [ref!].
 License: MIT + file LICENSE
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
